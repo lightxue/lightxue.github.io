@@ -1,43 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
+  <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-05T00:04:20+08:00</updated>
+  <updated>2014-06-05T00:25:09+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[Light Xue]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Test]]></title>
-    <link href="http://lightxue.github.io/test.html"/>
-    <updated>2014-06-04T00:00:00+08:00</updated>
-    <id>http://lightxue.github.io/test</id>
-    <content type="html"><![CDATA[<h1>h1</h1>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">this</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;hello world&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>code</li>
-<li>quote</li>
-</ul>
-
-
-<blockquote><p>quote
-quote</p></blockquote>
-]]></content>
-  </entry>
   
 </feed>
