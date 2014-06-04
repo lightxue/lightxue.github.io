@@ -3,9 +3,9 @@
 # ----------------------- #
 
 url: http://lightxue.github.io
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
-author: Your Name
+title: '0xFEE1C001'
+subtitle: Where there is a shell, there is a way
+author: Light Xue
 simple_search: https://www.google.com/search
 description:
 
@@ -27,7 +27,7 @@ email:
 
 # If publishing to a subdirectory as in http://site.com/project set 'root: /project'
 root: /
-permalink: /blog/:year/:month/:day/:title/
+permalink: none
 source: source
 destination: public
 plugins: plugins
@@ -63,8 +63,8 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.
 # ----------------------- #
 
 # Github repositories
-github_user:
-github_repo_count: 0
+github_user: lightxue
+github_repo_count: 5
 github_show_profile_link: true
 github_skip_forks: true
 
