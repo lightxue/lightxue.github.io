@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-05T00:25:09+08:00</updated>
+  <updated>2014-06-05T13:04:17+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -12,5 +12,40 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA['Test']]></title>
+    <link href="http://lightxue.github.io/test.html"/>
+    <updated>2014-06-05T13:03:41+08:00</updated>
+    <id>http://lightxue.github.io/test</id>
+    <content type="html"><![CDATA[<table>
+<thead>
+<tr>
+<th>a </th>
+<th> b </th>
+<th> c</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a </td>
+<td> b </td>
+<td> c</td>
+</tr>
+<tr>
+<td>a </td>
+<td> b </td>
+<td> c</td>
+</tr>
+<tr>
+<td>a </td>
+<td> b </td>
+<td> c</td>
+</tr>
+</tbody>
+</table>
+
+]]></content>
+  </entry>
   
 </feed>
