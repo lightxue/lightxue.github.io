@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-06T13:21:01+08:00</updated>
+  <updated>2014-06-06T13:22:28+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -44,6 +44,15 @@
 </tr>
 </tbody>
 </table>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">this</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;hello world&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>
