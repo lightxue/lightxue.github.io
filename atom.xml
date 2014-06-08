@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-07T01:31:48+08:00</updated>
+  <updated>2014-06-08T22:59:44+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -14,46 +14,118 @@
 
   
   <entry>
-    <title type="html"><![CDATA['test']]></title>
-    <link href="http://lightxue.github.io/test.html"/>
-    <updated>2014-06-05T13:03:41+08:00</updated>
-    <id>http://lightxue.github.io/test</id>
-    <content type="html"><![CDATA[<table>
-<thead>
-<tr>
-<th>a </th>
-<th> b </th>
-<th> c</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>a </td>
-<td> b </td>
-<td> c</td>
-</tr>
-<tr>
-<td>a </td>
-<td> b </td>
-<td> c</td>
-</tr>
-<tr>
-<td>a </td>
-<td> b </td>
-<td> c</td>
-</tr>
-</tbody>
-</table>
-
+    <title type="html"><![CDATA['python-integer-overflow']]></title>
+    <link href="http://lightxue.github.io/python-integer-overflow.html"/>
+    <updated>2014-06-08T22:50:32+08:00</updated>
+    <id>http://lightxue.github.io/python-integer-overflow</id>
+    <content type="html"><![CDATA[<p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">this</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;hello world&#39;</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="c1">// python解释器是C语言实现的</span>
+</span><span class='line'><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+</span><span class='line'><span class="nf">int_add</span><span class="p">(</span><span class="n">PyIntObject</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="n">PyIntObject</span> <span class="o">*</span><span class="n">w</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">register</span> <span class="kt">long</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">CONVERT_TO_LONG</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">CONVERT_TO_LONG</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+</span><span class='line'>    <span class="cm">/* casts in the line below avoid undefined behaviour on overflow */</span>
+</span><span class='line'>    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="kt">long</span><span class="p">)((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">);</span> <span class="c1">// 重点是这行</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">x</span><span class="o">^</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="n">x</span><span class="o">^</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>     <span class="c1">// 和这行</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">PyInt_FromLong</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">PyLong_Type</span><span class="p">.</span><span class="n">tp_as_number</span><span class="o">-&gt;</span><span class="n">nb_add</span><span class="p">((</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">)</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">)</span><span class="n">w</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p><code>((x^a) &gt;= 0 || (x^b) &gt;= 0)</code>如果是false，就是发生了溢出。这段代码咋看跟溢出没关系，细看还是挺有名堂的。这个if要判断的是符号位。我们知道，整型的最后一个bit如果是0，那么这个数大于等于0；如果是1，这个数小于0。这个表达式的<code>&gt;= 0</code>判断的就是是否最后一个bit是否是0。</p>
+
+<p>我们知道，^是异或运算：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="mi">0</span> <span class="o">^</span> <span class="mi">0</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class='line'><span class="mi">0</span> <span class="o">^</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span>
+</span><span class='line'><span class="mi">1</span> <span class="o">^</span> <span class="mi">0</span> <span class="o">==</span> <span class="mi">1</span>
+</span><span class='line'><span class="mi">1</span> <span class="o">^</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>简而言之就是两个bit相同得0，两个bit不同得1。也就是说<code>((x^a) &gt;= 0 || (x^b) &gt;= 0)</code>判断的是x与a的符号位相同或x与b的符号位相同。换而言之，x只要跟a和b任意一个数的符号位相同则为true。这跟溢出有什么关系？</p>
+
+<p>我们知道，一个long能表达的数的范围是有限制的，两个long相加的情况不外乎下面6种：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="c1">//  没有溢出的情况</span>
+</span><span class='line'><span class="err">非负数</span> <span class="o">+</span> <span class="err">非负数</span> <span class="o">=</span> <span class="err">非负数</span>
+</span><span class='line'><span class="err">非负数</span> <span class="o">+</span> <span class="err">负数</span> <span class="o">=</span> <span class="err">负</span><span class="o">/</span><span class="err">非负数</span>
+</span><span class='line'><span class="err">负数</span> <span class="o">+</span> <span class="err">非负数</span> <span class="o">=</span> <span class="err">负</span><span class="o">/</span><span class="err">非负数</span>
+</span><span class='line'><span class="err">负数</span> <span class="o">+</span> <span class="err">负数</span> <span class="o">=</span> <span class="err">负数</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 溢出的情况</span>
+</span><span class='line'><span class="err">非负数</span> <span class="o">+</span> <span class="err">非负数</span> <span class="o">=</span> <span class="err">负数</span>
+</span><span class='line'><span class="err">负数</span> <span class="o">+</span> <span class="err">负数</span> <span class="o">=</span> <span class="err">非负数</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以看到，没有溢出的情况刚好x和a、b其中一个的符号位相同，而溢出的情况x跟a、b的符号位都不同。所以<code>((x^a) &gt;= 0 || (x^b) &gt;= 0)</code>就刚好能判断出来a+b有没有溢出。</p>
+
+<p>好神奇，我和我的小伙伴们都惊呆了！</p>
+
+<p>有个地方不提一下这个讨论就不完整了。大家可能都注意到代码中的注释了：casts in the line below avoid undefined behaviour on overflow。在<a href="http://en.wikipedia.org/wiki/Integer_overflow">wikipedia</a>上看到的解释是这样的：</p>
+
+<blockquote><p>Since an arithmetic operation may produce a result larger than the maximum representable value, a potential error condition may result. In the C programming language, signed integer overflow causes undefined behavior, while unsigned integer overflow causes the number to be reduced modulo a power of two, meaning that unsigned integers &ldquo;wrap around&rdquo; on overflow.</p></blockquote>
+
+<p>如果是a和b都是signed long，溢出后结果是不确定的，看编译器的实现。如果a或b是unsigned long(相加时另一个也会转成unsigned long)，相加结果再转回long跟上面讨论的6种情况就一样了。</p>
+
+<p>最后留个问题吧，怎么判断两个数相减溢出了呢:&ndash;)</p>
+
+<p>补充：</p>
+
+<p>axu给了我另一种判断整数溢出的判断</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">t</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span> <span class="p">((</span><span class="n">a</span><span class="o">&lt;</span><span class="mi">0</span> <span class="o">==</span> <span class="n">b</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">t</span><span class="o">&lt;</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">a</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">))</span>
+</span><span class='line'>    <span class="c1">// overflow</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>细看其实思路跟上面说的一样，于是弃之不理。望仔看到这段代码后竟然想到去优化这它。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">t</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(((</span><span class="n">a</span><span class="o">^</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">((</span><span class="n">a</span><span class="o">^</span><span class="n">t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">))</span>
+</span><span class='line'>    <span class="c1">// overflow</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>确实比上面的解法有所提升。认真思考的心态值得学习，赞一下望仔。</p>
 ]]></content>
   </entry>
   
