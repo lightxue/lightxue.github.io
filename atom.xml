@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-08T23:14:31+08:00</updated>
+  <updated>2014-06-08T23:21:27+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[python判断整数相加溢出]]></title>
-    <link href="http://lightxue.github.io/Python/C/algorithm/python-integer-overflow.html"/>
+    <link href="http://lightxue.github.io/python-integer-overflow"/>
     <updated>2013-07-13T22:50:32+08:00</updated>
-    <id>http://lightxue.github.io/Python/C/algorithm/python-integer-overflow</id>
+    <id>http://lightxue.github.io/python-integer-overflow</id>
     <content type="html"><![CDATA[<h1></h1>
 
 <p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
