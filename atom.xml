@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-13T00:08:08+08:00</updated>
+  <updated>2014-06-13T00:09:21+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[relationship-among-object-class-metaclass-in-python]]></title>
+    <title type="html"><![CDATA[Python中对象、类型、元类之间的关系]]></title>
     <link href="http://lightxue.github.io/relationship-among-object-class-metaclass-in-python"/>
     <updated>2013-11-01T23:29:48+08:00</updated>
     <id>http://lightxue.github.io/relationship-among-object-class-metaclass-in-python</id>
