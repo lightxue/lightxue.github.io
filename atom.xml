@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-13T00:09:21+08:00</updated>
+  <updated>2014-06-13T00:11:40+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -22,7 +22,7 @@
 
 <p>1989年圣诞节期间，<a href="http://www.python.org/~guido/">上帝</a>很无聊，于是创造了一个世界。</p>
 
-<h1>对象</h1>
+<h2>对象</h2>
 
 <p>在这个世界的运转有几条定律。</p>
 
@@ -68,7 +68,7 @@
 
 <p>再说一次：Python世界里，一切都是对象</p>
 
-<h1>类型</h1>
+<h2>类型</h2>
 
 <p>类(class)就是生产出对象的模具(本文只讨论<a href="http://docs.python.org/2/reference/datamodel.html#new-style-and-classic-classes">new-style class</a>，classic class不在讨论范围内)。上面说到，每个对象天生都会有个铭牌，写着自己的类型。在Python里，类(class)和型(type)指的是同一件东西。汉字真是精妙，类和型放在一块念是多么的自然。</p>
 
@@ -101,7 +101,7 @@
 
 <p>这里必须要提一下一个特殊的模具，堪称模具之母的模具：object。这个object不是上文说的对象，上文的对象是一个抽象的概念，这里的object是一个具体的模具。所有的模具(除了object自己)沿着印记向上追溯，最后肯定到object。也就是说，所有除了object自己以外的类，都直接或间接地继承了object，无论是内置的(buit-in)还是自定义的(user-defined)。另一方面看，所有对象都直接或间接由模具object生产出来。如果有兴趣的话，用<code>type()</code>把想查看对象的类型找到，再用<code>__baess__</code>向上查找，最后肯定会到object。从源码的角度看，object就是上文提到的PyObject。这跟Python里所有的对象都能用PyObject的指针访问是有关系的。</p>
 
-<h1>元类</h1>
+<h2>元类</h2>
 
 <p>定律1说到，一切都是对象，类型也是对象。相比很多语言，这一点非常特别。</p>
 
@@ -153,7 +153,7 @@
 
 <p>我们看到，type这个模具是object为原型造的，而生产object的模具却是type。鸡先生蛋还是蛋先生鸡？Python这个世界是运行在虚拟机上的。世界创建之初虚拟机就把type和object都造出来了。object一出世，生产的模具就写着是type；type一出世，模板的版权印记就记着object。他们一开始就存在了，无所谓谁先谁后。同理，type是不是自己把自己创建也来的问题也一样。</p>
 
-<h1>总结</h1>
+<h2>总结</h2>
 
 <p><img src="http://lightxue.github.io/image/python_types_map.png" title="对象、类型、元类之间的关系" alt="对象、类型、元类之间的关系" /></p>
 
