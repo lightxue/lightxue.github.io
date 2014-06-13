@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | 0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-13T21:00:49+08:00</updated>
+  <updated>2014-06-13T21:01:48+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -136,9 +136,10 @@ type.<strong>bases</strong>
     <link href="http://lightxue.github.io/python-integer-overflow"/>
     <updated>2013-07-13T22:50:32+08:00</updated>
     <id>http://lightxue.github.io/python-integer-overflow</id>
-    <content type="html"><![CDATA[<h1></h1>
+    <content type="html"><![CDATA[<p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
 
-<p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
+<!--more-->
+
 
 <p>```c
 // python解释器是C语言实现的
