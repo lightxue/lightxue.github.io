@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | 0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-13T00:31:45+08:00</updated>
+  <updated>2014-06-13T21:00:49+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -21,6 +21,9 @@
     <content type="html"><![CDATA[<p>Python里的对象、类型和元类的关系很微妙也很有意思。</p>
 
 <p>1989年圣诞节期间，<a href="http://www.python.org/~guido/">上帝</a>很无聊，于是创造了一个世界。</p>
+
+<!--more-->
+
 
 <h2>对象</h2>
 
