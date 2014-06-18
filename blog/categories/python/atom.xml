@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | 0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-18T22:14:05+08:00</updated>
+  <updated>2014-06-18T22:22:10+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[使用PLY编写多功能计算器]]></title>
     <link href="http://lightxue.github.io/write-swisscalc-by-ply"/>
-    <updated>2014-06-18T22:00:52+08:00</updated>
+    <updated>2013-11-24T22:00:52+08:00</updated>
     <id>http://lightxue.github.io/write-swisscalc-by-ply</id>
     <content type="html"><![CDATA[<p>最近用<a href="http://www.dabeaz.com/ply/ply.html">PLY</a>(Python Lex-Yacc)写了个Vim插件：<a href="https://github.com/lightxue/SwissCalc">SwissCalc</a>。借这个机会复习了下编译原理的一些知识。下面介绍一下用PLY写SwissCalc的过程吧。</p>
 
@@ -140,9 +140,10 @@ yacc.yacc(module=self,</p>
       outputdir=self.basedir)
 </code></pre>
 
-<p><code>
-2.编写产生式，像这样的。
-</code>python
+<p>```</p>
+
+<p>2.编写产生式，像这样的。
+```python
 expression : expression add expression</p>
 
 <pre><code>       | expression subtract expression
@@ -167,8 +168,9 @@ expression : expression add expression</p>
 <pre><code>       | exponentfloat
 </code></pre>
 
-<p><code>``
-注意，产生式出来的语法树，叶子节点肯定要是词法解析的token，比如上面的</code>ident<code></code>pointfloat<code></code>exponentfloat`。</p>
+<p>```</p>
+
+<p>注意，产生式出来的语法树，叶子节点肯定要是词法解析的token，比如上面的<code>ident</code> <code>pointfloat</code> <code>exponentfloat</code>。</p>
 
 <p>3.指定运算符的结合性和优先级。</p>
 
@@ -190,9 +192,10 @@ precedence = (</p>
 )
 </code></pre>
 
-<p><code>
-4.每一条产生式编写对应的函数，做语义分析。
-</code>python
+<p>```</p>
+
+<p>4.每一条产生式编写对应的函数，做语义分析。
+```python
 def p_expression_binop(self, p):</p>
 
 <pre><code>'''
@@ -217,8 +220,9 @@ else:
     p[0] = self.int_binops[p[2]](int(p[1]), int(p[3]))
 </code></pre>
 
-<p><code>``
-像上面这个函数，函数名无所谓，但必须要有</code>p_<code>开头，参数必须 只有一个，docstring是产生式。参数</code>p<code>就像个元组一样，从0开始顺序对应表达式里的各个单词。上面的函数，就是计算器里的二元操作，</code>p[0]<code>保存计算结果，</code>p[2]<code>是运算符，</code>p[1]<code>和</code>p[3]`是需要操作的数。</p>
+<p>```</p>
+
+<p>像上面这个函数，函数名无所谓，但必须要有<code>p_</code>开头，参数必须 只有一个，docstring是产生式。参数<code>p</code>就像个元组一样，从0开始顺序对应表达式里的各个单词。上面的函数，就是计算器里的二元操作，<code>p[0]</code>保存计算结果，<code>p[2]</code>是运算符，<code>p[1]</code>和<code>p[3]</code>是需要操作的数。</p>
 
 <p><code>p_error</code>在语法解析错误的时候会调用，在里面做一些错误处理。</p>
 
