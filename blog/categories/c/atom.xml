@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C | 0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/blog/categories/c/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-18T22:30:39+08:00</updated>
+  <updated>2014-06-18T22:31:34+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -18,8 +18,12 @@
     <link href="http://lightxue.github.io/strlen-implementation"/>
     <updated>2013-12-07T22:23:46+08:00</updated>
     <id>http://lightxue.github.io/strlen-implementation</id>
-    <content type="html"><![CDATA[<p>感谢<a href="https://plus.google.com/u/0/102034236640204820044">John Smith</a>来稿，笔风太有趣了，能当本博的专栏作家吗？
-```</p>
+    <content type="html"><![CDATA[<p>感谢<a href="https://plus.google.com/u/0/102034236640204820044">John Smith</a>来稿，笔风太有趣了，能当本博的专栏作家吗？</p>
+
+<!--more-->
+
+
+<p>```c</p>
 
 <pre><code>size_t strlen(const char* str)
 {
@@ -30,9 +34,10 @@
 }
 </code></pre>
 
-<p><code>
-这大概是通常的写法，或者是像C语言程序设计的示例
-</code>c</p>
+<p>```</p>
+
+<p>这大概是通常的写法，或者是像C语言程序设计的示例
+```c</p>
 
 <pre><code>int strlen(char* s)
 {
