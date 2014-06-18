@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C | 0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/blog/categories/c/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-18T22:22:10+08:00</updated>
+  <updated>2014-06-18T22:30:39+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -12,6 +12,138 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[strlen的实现方法]]></title>
+    <link href="http://lightxue.github.io/strlen-implementation"/>
+    <updated>2013-12-07T22:23:46+08:00</updated>
+    <id>http://lightxue.github.io/strlen-implementation</id>
+    <content type="html"><![CDATA[<p>感谢<a href="https://plus.google.com/u/0/102034236640204820044">John Smith</a>来稿，笔风太有趣了，能当本博的专栏作家吗？
+```</p>
+
+<pre><code>size_t strlen(const char* str)
+{
+    size_t len = 0;
+    while (*str++)
+        len++;
+    return len;
+}
+</code></pre>
+
+<p><code>
+这大概是通常的写法，或者是像C语言程序设计的示例
+</code>c</p>
+
+<pre><code>int strlen(char* s)
+{
+    char *p = s;
+    while(*p++)
+        ;
+    return p - s;
+}
+</code></pre>
+
+<p>```</p>
+
+<p>和某B偶然说到这个函数，那B说面试的时候老大问了strlen的写法，他当时用了一种
+比较快速的方法。第一反应这货还有快速实现？怎么搞都得遍历完这个字符串，O(n)没跑了，你丫忽悠我。</p>
+
+<p>答曰不是，然后上网去搜了一个glibc的strlen实现。大概如下：
+```c</p>
+
+<pre><code>size_t strlen (const char *str)
+{
+    const char *char_ptr;
+    const unsigned long int *longword_ptr;
+    unsigned long int longword, magic_bits, himagic, lomagic;
+
+    for (char_ptr = str; ((unsigned long int) char_ptr
+            &amp; (sizeof (longword) - 1)) != 0;
+                ++char_ptr)
+        if (*char_ptr == '\0')
+            return char_ptr - str;
+
+    longword_ptr = (unsigned long int *) char_ptr;
+
+    magic_bits = 0x7efefeffL;
+    himagic = 0x80808080L;
+    lomagic = 0x01010101L;
+    if (sizeof (longword) &gt; 4)
+    {
+        magic_bits = ((0x7efefefeL &lt;&lt; 16) &lt;&lt; 16) | 0xfefefeffL;
+        himagic = ((himagic &lt;&lt; 16) &lt;&lt; 16) | himagic;
+        lomagic = ((lomagic &lt;&lt; 16) &lt;&lt; 16) | lomagic;
+    }
+    if (sizeof (longword) &gt; 8)
+        abort ();
+
+    for (;;)
+    {
+        longword = *longword_ptr++;
+
+        if (((longword - lomagic) &amp; himagic) != 0)
+        {
+            const char *cp = (const char *) (longword_ptr - 1);
+
+            if (cp[0] == 0)
+                return cp - str;
+            if (cp[1] == 0)
+                return cp - str + 1;
+            if (cp[2] == 0)
+                return cp - str + 2;
+            if (cp[3] == 0)
+                return cp - str + 3;
+            if (sizeof (longword) &gt; 4)
+            {
+                if (cp[4] == 0)
+                    return cp - str + 4;
+                if (cp[5] == 0)
+                    return cp - str + 5;
+                if (cp[6] == 0)
+                    return cp - str + 6;
+                if (cp[7] == 0)
+                    return cp - str + 7;
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>艹，这么长(你这么想了，你一定这么想了)。</p>
+
+<p>大概看了下，主要思想是一次取4/8个字节的数据进行判断。减少了将数据从内存搬到寄存器的指令次数。碉堡了，简直碉堡了。</p>
+
+<p>以32位机器为例。</p>
+
+<p>第一步地址4字节对齐。将地址与上<code>0x03</code>，抹掉前面的bits，留下最后两位，检查是否为0，为0则地址是4字节对齐的退出循环，否则地址+1。</p>
+
+<p>第二步4字节作步长，检查取到的4字节中是否有<code>\0</code>，有的话，return 长度，没有继续往后走。检查是否有<code>\0</code>，是通过 <code>(x - 0x01010101L) &amp; 0x80808080L != 0</code>来做的。至于为啥可以这么做，自行列竖式试验下就知道了。如果有<code>\0</code>，遍历那4个字节，看具体是哪个字节是<code>\0</code>。</p>
+
+<p>至此，实现方式已经清楚了。</p>
+
+<p>但是这种方式实际上对于非ascii字符串是有问题的，会误判。所谓步子迈大了容易扯着tama。 unicode，GBK啥的，虽然函数不会出错，但是效率退化到和普通遍历一样了。 GBK是这样编码的好像，比如两字节表示一个字，这种情况下第一个字节肯定是大于等于128。就是说第一个字节最高位是1，这样 <code>(x - 0x01010101L) &amp; 0x80808080L != 0</code>判断是否有<code>\0</code>就失效了，就算上面的判断为true，那4个字节也没有<code>\0</code>，代码会遍历那4个字节，发现实际上没有<code>\0</code>，不退出，继续往后走直到找到<code>\0</code>。</p>
+
+<p>理论上对于ascii字符串，glibc的实现可以达到3X的效率提升，仔细想想 Is it worthwhile?</p>
+
+<p>who knows? ╮(╯_╰)╭, it all depends.</p>
+
+<p>现在的电脑，内存带宽大概在5GB/s(我胡邹的)，<code>mov VAR, %eax</code>这条指令大约消耗十几到几十个时钟周期(这也是胡诌的)。做这样的优化是否有意义不太好说，真是超级无所谓的事情。对程序员来说，就知道大概有这么一种思想，可以这么做，聊以自慰罢了。</p>
+
+<p>&mdash;&mdash;喂喂，你是认真的么</p>
+
+<p>&mdash;&mdash;我错了，我说谎了，最大作用是可以和别人拿来zhuangbility。。。</p>
+
+<p>顺便说一下，CRC32算法也用到这种的思想了(同上)。一次取4字节数据进行计算 + 打表。可以达到原本计算方法几十倍速度的提升吧，大概。。。有兴趣自行wikipedia。</p>
+
+<p>以上</p>
+
+<p>john_smith，2013-12-07，一边听着柿姐的&lt;虎视眈眈>，一边看里番，一边想着中午吃什么，一边写这个。</p>
+
+<p>无所谓，真是超级无所谓的事情。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[python判断整数相加溢出]]></title>
