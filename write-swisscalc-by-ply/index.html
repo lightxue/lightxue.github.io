@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>0xFEE1C001</title>
+  <title>使用PLY编写多功能计算器 - 0xFEE1C001</title>
   <meta name="author" content="Light Xue">
 
   
@@ -19,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://lightxue.github.io/">
+  <link rel="canonical" href="http://lightxue.github.io/write-swisscalc-by-ply">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,15 +79,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/write-swisscalc-by-ply">使用PLY编写多功能计算器</a></h1>
+      <h1 class="entry-title">使用PLY编写多功能计算器</h1>
     
     
       <p class="meta">
@@ -105,14 +102,14 @@
 
 <time datetime="2014-06-18T22:00:52+08:00" pubdate data-updated="true">Jun 18<span>th</span>, 2014</time>
         
-         | <a href="/write-swisscalc-by-ply#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>最近用<a href="http://www.dabeaz.com/ply/ply.html">PLY</a>(Python Lex-Yacc)写了个Vim插件：<a href="https://github.com/lightxue/SwissCalc">SwissCalc</a>。借这个机会复习了下编译原理的一些知识。下面介绍一下用PLY写SwissCalc的过程吧。</p>
+<div class="entry-content"><p>最近用<a href="http://www.dabeaz.com/ply/ply.html">PLY</a>(Python Lex-Yacc)写了个Vim插件：<a href="https://github.com/lightxue/SwissCalc">SwissCalc</a>。借这个机会复习了下编译原理的一些知识。下面介绍一下用PLY写SwissCalc的过程吧。</p>
 
 <h2>程序结构</h2>
 
@@ -520,67 +517,16 @@
 
 <p>以上就是怎么用PLY实现<a href="https://github.com/lightxue/SwissCalc/tree/v1.0.0">SwissCalc v1.0.0</a>(1.0.0? 我这么懒难道还会有更高版本吗？)。</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/relationship-among-object-class-metaclass-in-python">Python中对象、类型、元类之间的关系</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Light Xue</span></span>
 
-<time datetime="2013-11-01T23:29:48+08:00" pubdate data-updated="true">Nov 1<span>st</span>, 2013</time>
-        
-         | <a href="/relationship-among-object-class-metaclass-in-python#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Python里的对象、类型和元类的关系很微妙也很有意思。</p>
-
-<p>1989年圣诞节期间，<a href="http://www.python.org/~guido/">上帝</a>很无聊，于是创造了一个世界。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/relationship-among-object-class-metaclass-in-python">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/python-integer-overflow">Python判断整数相加溢出</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -592,34 +538,46 @@
   
 
 
-<time datetime="2013-07-13T22:50:32+08:00" pubdate data-updated="true">Jul 13<span>th</span>, 2013</time>
-        
-         | <a href="/python-integer-overflow#disqus_thread">Comments</a>
-        
-      </p>
+<time datetime="2014-06-18T22:00:52+08:00" pubdate data-updated="true">Jun 18<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/python/'>Python</a>
+  
+</span>
+
+
+    </p>
     
-  </header>
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://lightxue.github.io/write-swisscalc-by-ply" data-via="" data-counturl="http://lightxue.github.io/write-swisscalc-by-ply" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/relationship-among-object-class-metaclass-in-python" title="Previous Post: Python中对象、类型、元类之间的关系">&laquo; Python中对象、类型、元类之间的关系</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-  <div class="entry-content"><p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/python-integer-overflow">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
 <aside class="sidebar">
   
     <section>
@@ -644,7 +602,7 @@
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <script type="text/javascript">
@@ -685,6 +643,7 @@
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -699,7 +658,10 @@
       var disqus_shortname = '0xfee1c00l';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://lightxue.github.io/write-swisscalc-by-ply';
+        var disqus_url = 'http://lightxue.github.io/write-swisscalc-by-ply';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
