@@ -1,14 +1,16 @@
 ---
 layout: post
-title: "python判断整数相加溢出"
+title: python断整数相加溢出
 date: 2013-07-13 22:50:32 +0800
 comments: true
 categories: [Python, C, algorithm]
+keywords: 溢出, Python, 源码, 整数溢出, integer overflow
+description: 剖析Python源码，分析Python如何判断整数溢出
 ---
 
-# 
-
 在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。
+
+<!--more-->
 
 ```c
 // python解释器是C语言实现的

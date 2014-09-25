@@ -6,8 +6,10 @@ url: http://lightxue.github.io
 title: '0xFEE1C001'
 subtitle: Where there is a shell, there is a way
 author: Light Xue
-simple_search: https://www.google.com/search
-description:
+#simple_search: https://www.google.com/search
+simple_search: https://wen.lu/search
+description: '0xfee1c001', Light Xue's blog
+keywords: c, c++, python, linux, network, program, lightxue, Light Xue, develop, algorithm, fee1c001, '0xfee1c001', feelcool
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
@@ -63,7 +65,7 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.
 # ----------------------- #
 
 # Github repositories
-github_user: lightxue
+github_user:
 github_repo_count: 5
 github_show_profile_link: false
 github_skip_forks: false

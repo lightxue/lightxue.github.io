@@ -4,12 +4,16 @@ title: Python中对象、类型、元类之间的关系
 date: 2013-11-01 23:29:48 +0800
 comments: true
 categories: Python
+keywords: Python, object, class, type, metaclass, 对象, 类型, 元类
+description: 解释Python中对象、类型和元类之前的关系
 ---
 
 
 Python里的对象、类型和元类的关系很微妙也很有意思。
 
 1989年圣诞节期间，[上帝](http://www.python.org/~guido/)很无聊，于是创造了一个世界。
+
+<!--more-->
 
 ## 对象
 
