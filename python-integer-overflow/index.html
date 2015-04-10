@@ -123,9 +123,12 @@ int_add( &hellip;">
   </header>
 
 
-<div class="entry-content"><h1></h1>
+<div class="entry-content"><p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
 
-<p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
+<!--more-->
+
+
+
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -302,6 +305,14 @@ int_add( &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/strlen-implementation">strlen的实现方法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/write-swisscalc-by-ply">使用PLY编写多功能计算器</a>
+      </li>
+    
+      <li class="post">
         <a href="/relationship-among-object-class-metaclass-in-python">Python中对象、类型、元类之间的关系</a>
       </li>
     
@@ -310,34 +321,6 @@ int_add( &hellip;">
       </li>
     
   </ul>
-</section>
-
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating...</li>
-  </ul>
-  
-  <script type="text/javascript">
-    $.domReady(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'lightxue',
-            count: 5,
-            skip_forks: false,
-            target: '#gh_repos',
-            blacklist: ''
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 
