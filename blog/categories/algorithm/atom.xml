@@ -4,7 +4,7 @@
   <title><![CDATA[Category: algorithm | 0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/blog/categories/algorithm/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-18T22:40:29+08:00</updated>
+  <updated>2015-06-17T01:43:45+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -151,7 +151,7 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[python判断整数相加溢出]]></title>
+    <title type="html"><![CDATA[python断整数相加溢出]]></title>
     <link href="http://lightxue.github.io/python-integer-overflow"/>
     <updated>2013-07-13T22:50:32+08:00</updated>
     <id>http://lightxue.github.io/python-integer-overflow</id>
