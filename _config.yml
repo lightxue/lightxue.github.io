@@ -6,9 +6,9 @@ url: http://lightxue.github.io
 title: '0xFEE1C001'
 subtitle: Where there is a shell, there is a way
 author: Light Xue
-#simple_search: https://www.google.com/search
-simple_search: https://wen.lu/search
-description: '0xfee1c001', Light Xue's blog
+simple_search: https://www.google.com/search
+#simple_search: https://wen.lu/search
+description: 0xFEE1C001, Light Xue's blog
 keywords: c, c++, python, linux, network, program, lightxue, Light Xue, develop, algorithm, fee1c001, '0xfee1c001', feelcool
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
@@ -41,7 +41,7 @@ rdiscount:
     - autolink
     - footnotes
     - smart
-pygments: false # default python pygments have been replaced by pygments.rb
+pygments: true # default python pygments have been replaced by pygments.rb
 
 paginate: 10          # Posts per page on the blog index
 pagination_dir: blog  # Directory base for pagination URLs eg. /blog/page/2/
@@ -96,7 +96,7 @@ disqus_short_name: 0xfee1c00l
 disqus_show_comment_count: true
 
 # Google Analytics
-google_analytics_tracking_id: UA-42436465-1
+google_analytics_tracking_id:
 
 # Facebook Like
 facebook_like: false
