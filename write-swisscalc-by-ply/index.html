@@ -8,10 +8,13 @@
   <title>使用PLY编写多功能计算器 - 0xFEE1C001</title>
   <meta name="author" content="Light Xue">
 
+  <!---->
   
-  <meta name="description" content="最近用PLY(Python Lex-Yacc)写了个Vim插件：SwissCalc。借这个机会复习了下编译原理的一些知识。下面介绍一下用PLY写SwissCalc的过程吧。 程序结构 程序分成3个部分 计算器(autoload/swisscalc.py)
-内置函数(autoload/builtin &hellip;">
-  
+  <meta name="description" content="用PLY实现程序员专用的Vim计算器，解释了一些PLY用法和编译原理知识">
+  <!--<meta name="keywords" content="Python, PLY, LALR, 解释器, 计算器, SwissCalc, 词法解析, 语法解析, calculator, BNF, 结合性, 命名空间">-->
+  <meta name="keywords" content="Python, PLY, LALR, 解释器, 计算器, SwissCalc, 词法解析, 语法解析, calculator, BNF, 结合性, 命名空间">
+
+
 
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
@@ -31,22 +34,6 @@
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 
   
-
-
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-42436465-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-
 
 </head>
 
@@ -590,6 +577,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/about-barriers">关于barrier</a>
+      </li>
+    
+      <li class="post">
         <a href="/strlen-implementation">strlen的实现方法</a>
       </li>
     
@@ -602,7 +593,7 @@
       </li>
     
       <li class="post">
-        <a href="/python-integer-overflow">python判断整数相加溢出</a>
+        <a href="/python-integer-overflow">python断整数相加溢出</a>
       </li>
     
   </ul>
@@ -628,7 +619,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Light Xue -
+  Copyright &copy; 2015 - Light Xue -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

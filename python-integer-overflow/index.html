@@ -5,27 +5,16 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>python判断整数相加溢出 - 0xFEE1C001</title>
+  <title>python断整数相加溢出 - 0xFEE1C001</title>
   <meta name="author" content="Light Xue">
 
+  <!---->
   
-  <meta name="description" content="在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-// python解释器是C语言实现的
-static PyObject *
-int_add( &hellip;">
-  
+  <meta name="description" content="剖析Python源码，分析Python如何判断整数溢出">
+  <!--<meta name="keywords" content="溢出, Python, 源码, 整数溢出, integer overflow">-->
+  <meta name="keywords" content="溢出, Python, 源码, 整数溢出, integer overflow">
+
+
 
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
@@ -45,22 +34,6 @@ int_add( &hellip;">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 
   
-
-
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-42436465-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-
 
 </head>
 
@@ -98,7 +71,7 @@ int_add( &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Python判断整数相加溢出</h1>
+      <h1 class="entry-title">Python断整数相加溢出</h1>
     
     
       <p class="meta">
@@ -305,6 +278,10 @@ int_add( &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/about-barriers">关于barrier</a>
+      </li>
+    
+      <li class="post">
         <a href="/strlen-implementation">strlen的实现方法</a>
       </li>
     
@@ -317,7 +294,7 @@ int_add( &hellip;">
       </li>
     
       <li class="post">
-        <a href="/python-integer-overflow">python判断整数相加溢出</a>
+        <a href="/python-integer-overflow">python断整数相加溢出</a>
       </li>
     
   </ul>
@@ -343,7 +320,7 @@ int_add( &hellip;">
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Light Xue -
+  Copyright &copy; 2015 - Light Xue -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

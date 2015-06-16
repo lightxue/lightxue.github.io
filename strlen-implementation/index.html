@@ -8,18 +8,13 @@
   <title>strlen的实现方法 - 0xFEE1C001</title>
   <meta name="author" content="Light Xue">
 
+  <!---->
   
-  <meta name="description" content="感谢John Smith来稿，笔风太有趣了，能当本博的专栏作家吗？ 1
-2
-3
-4
-5
-6
-7
-size_t strlen(const char* str)
-{ size_t len = 0; while (*str++) len++; return len;
-} 这大概是通常的写法， &hellip;">
-  
+  <meta name="description" content="解析一段牛逼的strlen实现">
+  <!--<meta name="keywords" content="strlen, C, algorithm">-->
+  <meta name="keywords" content="strlen, C, algorithm">
+
+
 
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
@@ -39,22 +34,6 @@ size_t strlen(const char* str)
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 
   
-
-
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-42436465-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-
 
 </head>
 
@@ -361,6 +340,8 @@ size_t strlen(const char* str)
         <a class="basic-alignment left" href="/write-swisscalc-by-ply" title="Previous Post: 使用PLY编写多功能计算器">&laquo; 使用PLY编写多功能计算器</a>
       
       
+        <a class="basic-alignment right" href="/about-barriers" title="Next Post: 关于barrier">关于barrier &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -380,6 +361,10 @@ size_t strlen(const char* str)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/about-barriers">关于barrier</a>
+      </li>
+    
+      <li class="post">
         <a href="/strlen-implementation">strlen的实现方法</a>
       </li>
     
@@ -392,7 +377,7 @@ size_t strlen(const char* str)
       </li>
     
       <li class="post">
-        <a href="/python-integer-overflow">python判断整数相加溢出</a>
+        <a href="/python-integer-overflow">python断整数相加溢出</a>
       </li>
     
   </ul>
@@ -418,7 +403,7 @@ size_t strlen(const char* str)
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Light Xue -
+  Copyright &copy; 2015 - Light Xue -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

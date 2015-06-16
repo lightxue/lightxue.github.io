@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2014-06-18T22:40:29+08:00</updated>
+  <updated>2015-06-17T01:55:00+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -12,6 +12,151 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[关于barrier]]></title>
+    <link href="http://lightxue.github.io/about-barriers"/>
+    <updated>2015-04-10T16:50:24+08:00</updated>
+    <id>http://lightxue.github.io/about-barriers</id>
+    <content type="html"><![CDATA[<p>再次收到John Smith的来稿，为了你这篇稿子，我停笔一年了呀。</p>
+
+<p>memory barrier内存屏障，一种非常底层的同步原语，是memory ordering的一部分。
+使用内存屏障可以阻止编译器或cpu对内存的乱序访问，其中阻止编译时期重排的叫做
+compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
+
+<!-- more -->
+
+
+<h2>一. compiler barrier</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#define barrier()   __asm__ __volatile__(&quot;&quot;:::&quot;memory&quot;)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>看开源项目代码可能偶尔会看上面这样的内嵌汇编:
+1. 内嵌汇编的格式为<code>__asm__</code> (&ldquo;asm statement&rdquo; : outputs : inputs : registers-modified)
+2. <code>__asm__</code>用于提示编译器在这里插入汇编代码
+3. <code>__volatile__</code>用于告诉编译器，严禁将此处的汇编代码和其他语句进行重排优化，所得即所见
+4. <code>"":::</code>空的汇编语句，实际上不做任何事情
+5. <code>"memory"</code>强制编译器假设RAM所有内存单元均被汇编指令修改，cpu的registers和cache的缓存数据将invalidate，cpu不得不在需要的时候重新从内存读取数据
+6. 这条语句实际上不生成任何代码，但是会让gcc在barrier()之后刷新寄存器对变量的分配</p>
+
+<p>举个例子，考虑下面这段代码:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">task_struct</span> <span class="o">*</span><span class="n">owner</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">owner</span> <span class="o">=</span> <span class="n">lock</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">owner</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">mutex_spin_on_owner</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">owner</span><span class="p">))</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="cm">/* ... */</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这段代码含义大概是自旋的去获取一个mutex, 乍看一下没有问题。但是optimize编译下，compiler发现
+循环里面完全没有去修改<code>lock-&gt;owner</code>嘛，没必要每次都取值。然后这段代码可能会优化为这样:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">owner</span> <span class="o">=</span> <span class="n">lock</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">;</span>
+</span><span class='line'><span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">owner</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">mutex_spin_on_owner</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">owner</span><span class="p">))</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这肯定不是你想要的结果，而且极有可能出现死循环。</p>
+
+<p>多线程情况下，编译器优化有可能会忽略<code>lock-&gt;owner</code>会被其他线程修改的情况。compiler barrier可以告诉编译器这里禁止优化，每次都从内存里面取<code>lock-&gt;owner</code>的值。修改后：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">task_struct</span> <span class="o">*</span><span class="n">owner</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">barrier</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">owner</span> <span class="o">=</span> <span class="n">lock</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">owner</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">mutex_spin_on_owner</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">owner</span><span class="p">))</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="cm">/* ... */</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注：这里不用compiler barrier，<code>onwer = (volatile struct task_struct *)(lock-&gt;owner)</code>;
+直接强转为volatile指针也可以解决问题。</p>
+
+<h2>二. memory barrier</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#define mb()        __asm__ __volatile__(&quot;lock; addl $0, 0(%%rsp)&quot;:::&quot;memory&quot;)</span>
+</span><span class='line'><span class="cp">#define rmb()       mb()</span>
+</span><span class='line'><span class="cp">#define wmb()       __asm__ __volatile__(&quot;&quot;:::&quot;memory&quot;)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面三个分别是读写内存屏障，读内存屏障和写内存屏障，在常见的x86/x64体系下，通常使用<code>lock</code>指令前缀
+加上一个空操作来实现memory barrier, 注意当然不能是真的nop指令，linux中采用<code>addl $0, 0(%esp)</code>。</p>
+
+<p>memory barrier可以保证运行时期的内存访问次序不被重排，保证程序的执行看上去满足顺序一致性。<code>volatile</code>关键字无法做到这一点，所以<code>volatile</code>不能保证是一个memory barrier。</p>
+
+<p>另外也不能指望独立的memory barrier能不做很多事情，mb往往是成对出现的。</p>
+
+<p>考虑下面这种情况，机器有两个核心，x和y都被初始化为0：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">CPU</span> <span class="mi">0</span>                   <span class="n">CPU</span> <span class="mi">1</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>                  <span class="n">r1</span> <span class="o">=</span> <span class="n">y</span><span class="p">;</span>
+</span><span class='line'><span class="n">mb</span><span class="p">();</span>                   <span class="n">mb</span><span class="p">();</span>
+</span><span class='line'><span class="n">y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>                  <span class="n">r2</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>CPU 0和CPU 1走完所有语句之后，总共有下面三种可能:
+1. r1 == 0 &amp;&amp; r2 == 0: CPU 0在CPU1执行完之后才开始
+2. r1 == 0 &amp;&amp; r2 == 1: CPU 0和CPU 1物理上并行执行
+3. r1 == 1 &amp;&amp; r2 == 1: CPU 1在CPU 0执行完之后才开始</p>
+
+<p>只有<code>r1 == 1 &amp;&amp; r2 == 0</code>这种输出被禁止了，如果这种情况真的出现，那你可以报警了。
+这种情况仅仅当CPU 0或CPU 1出现乱序执行的时候才会出现，mb就是为了禁止乱序执行的。
+目前Intel的CPU都遵循处理一致性，所有的写操作都遵循程序顺序，不会越过前面的读写操作，不过由于未来可能
+会采用更弱的内存一致性模型，在代码里面适当的加上mb保证内存事件的次序仍然是必要的。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[strlen的实现方法]]></title>
@@ -785,7 +930,7 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[python判断整数相加溢出]]></title>
+    <title type="html"><![CDATA[python断整数相加溢出]]></title>
     <link href="http://lightxue.github.io/python-integer-overflow"/>
     <updated>2013-07-13T22:50:32+08:00</updated>
     <id>http://lightxue.github.io/python-integer-overflow</id>
