@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C | 0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/blog/categories/c/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2015-06-17T01:55:00+08:00</updated>
+  <updated>2015-06-17T12:32:30+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -35,13 +35,17 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
 
 <p>```</p>
 
-<p>看开源项目代码可能偶尔会看上面这样的内嵌汇编:
-1. 内嵌汇编的格式为<code>__asm__</code> (&ldquo;asm statement&rdquo; : outputs : inputs : registers-modified)
-2. <code>__asm__</code>用于提示编译器在这里插入汇编代码
-3. <code>__volatile__</code>用于告诉编译器，严禁将此处的汇编代码和其他语句进行重排优化，所得即所见
-4. <code>"":::</code>空的汇编语句，实际上不做任何事情
-5. <code>"memory"</code>强制编译器假设RAM所有内存单元均被汇编指令修改，cpu的registers和cache的缓存数据将invalidate，cpu不得不在需要的时候重新从内存读取数据
-6. 这条语句实际上不生成任何代码，但是会让gcc在barrier()之后刷新寄存器对变量的分配</p>
+<p>看开源项目代码可能偶尔会看上面这样的内嵌汇编:</p>
+
+<ol>
+<li>内嵌汇编的格式为<code>__asm__</code> (&ldquo;asm statement&rdquo; : outputs : inputs : registers-modified)</li>
+<li><code>__asm__</code>用于提示编译器在这里插入汇编代码</li>
+<li><code>__volatile__</code>用于告诉编译器，严禁将此处的汇编代码和其他语句进行重排优化，所得即所见</li>
+<li><code>"":::</code>空的汇编语句，实际上不做任何事情</li>
+<li><code>"memory"</code>强制编译器假设RAM所有内存单元均被汇编指令修改，cpu的registers和cache的缓存数据将invalidate，cpu不得不在需要的时候重新从内存读取数据</li>
+<li>这条语句实际上不生成任何代码，但是会让gcc在barrier()之后刷新寄存器对变量的分配</li>
+</ol>
+
 
 <p>举个例子，考虑下面这段代码:
 ```c
