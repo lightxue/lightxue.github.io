@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://lightxue.github.io/atom.xml" rel="self"/>
   <link href="http://lightxue.github.io/"/>
-  <updated>2015-06-17T12:33:51+08:00</updated>
+  <updated>2015-06-17T12:37:36+08:00</updated>
   <id>http://lightxue.github.io/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -153,9 +153,9 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
 <p>CPU 0和CPU 1走完所有语句之后，总共有下面三种可能:</p>
 
 <ol>
-<li>r1 == 0 &amp;&amp; r2 == 0: CPU 0在CPU1执行完之后才开始</li>
-<li>r1 == 0 &amp;&amp; r2 == 1: CPU 0和CPU 1物理上并行执行</li>
-<li>r1 == 1 &amp;&amp; r2 == 1: CPU 1在CPU 0执行完之后才开始</li>
+<li><p>r1 == 0 &amp;&amp; r2 == 0: CPU 0在CPU1执行完之后才开始</p></li>
+<li><p>r1 == 0 &amp;&amp; r2 == 1: CPU 0和CPU 1物理上并行执行</p></li>
+<li><p>r1 == 1 &amp;&amp; r2 == 1: CPU 1在CPU 0执行完之后才开始</p></li>
 </ol>
 
 
