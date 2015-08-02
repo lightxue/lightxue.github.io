@@ -10,6 +10,8 @@ categories: Linux
 
 最近整理nginx日志，用了一个类Unix系统上的古老工具——logrotate，发现意外的好用。想了解这个工具的用法推荐看[这里](http://www.thegeekstuff.com/2010/07/logrotate-examples/)。我了解了一下这个工具的运行机制和原理，觉得挺有趣的。
 
+<!--more-->
+
 ## 运行机制
 
 logrotate在很多Linux发行版上都是默认安装的。系统会定时运行logrotate，一般是每天一次。系统是这么实现按天执行的。crontab会每天定时执行`/etc/cron.daily`目录下的脚本，而这个目录下有个文件叫`logrotate`。在centos上脚本内容是这样的：
