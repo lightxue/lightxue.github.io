@@ -14,6 +14,8 @@ description: 找到Python解释器特定逻辑的源码位置
 
 感兴趣的部分源码怎么找？这个就是此文的主题了——如何找到特定逻辑的源码。
 
+<!--more-->
+
 ## 下载源码
 
 Python官方给的下载源码的方式在[这里](https://docs.python.org/devguide/setup.html#getting-the-source-code)。如果不想用Mercurial，也可以直接去[这里](https://www.python.org/downloads/)下对应的版本的Gzipped source tarball。
@@ -60,7 +62,7 @@ python
 
 C实现的标准库也有类似于`inspect`这种好用的方案，叫[cinspect](https://github.com/punchagan/cinspect)，不过我没有尝试过。C的标准库不多，命名也比较容易懂。所以直接去`Modules`找一般很容易找到。
 
-如果不想对着文件名猜某个模块是不是在这实现，就需要工具来帮忙了。这里推荐一下速度比`grep`快得多的[ack](http://beyondgrep.com/)。举个盒子，想找`time`的源码，可以执行这个命令。
+如果不想对着文件名猜某个模块是不是在这实现，就需要工具来帮忙了。这里推荐一下速度比`grep`快得多的[ack](http://beyondgrep.com/)。举个例子，想找`time`的源码，可以执行这个命令。
 
 ```bash
 > cd Modules
