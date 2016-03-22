@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Python源码寻宝记——地图
+title: Python源码寻宝记——地图篇
 date: 2016-03-22 23:44:21 +0800
 comments: true
 categories: Python
