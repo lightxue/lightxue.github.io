@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Python源码寻宝记——挖坑不埋
-date: 2016-03-22 20:34:21 +0800
+date: 2016-03-22 23:34:21 +0800
 comments: true
 categories: Python
 keywords: Python, python internals, how python works, python source code, python implenment, python源码剖析, python源码, python代码分析, python实现, python解释器实现
