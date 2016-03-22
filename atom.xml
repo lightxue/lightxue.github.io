@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[0xFEE1C001]]></title>
-  <link href="http://lightxue.github.io/atom.xml" rel="self"/>
-  <link href="http://lightxue.github.io/"/>
-  <updated>2015-08-03T03:06:52+08:00</updated>
-  <id>http://lightxue.github.io/</id>
+  <link href="http://blog.lightxue.com/atom.xml" rel="self"/>
+  <link href="http://blog.lightxue.com/"/>
+  <updated>2016-03-22T20:59:42+08:00</updated>
+  <id>http://blog.lightxue.com/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
     
@@ -14,10 +14,27 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Python源码寻宝记——挖坑不埋]]></title>
+    <link href="http://blog.lightxue.com/python-internals-introductory"/>
+    <updated>2016-03-22T20:34:21+08:00</updated>
+    <id>http://blog.lightxue.com/python-internals-introductory</id>
+    <content type="html"><![CDATA[<p>作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。</p>
+
+<p>记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。</p>
+
+<p>这个系列分析的Python源码版本是2.7.11和3.5.1，当前最新版。在<a href="https://www.python.org/downloads/">这里</a>可以找到下载链接。</p>
+
+<p>本文的目的是灌水+挖坑+索引这系列文章。开始寻宝吧。</p>
+
+<p><a href="http://blog.lightxue.com/python-internals-locate-source-code">Python源码寻宝记——地图</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[logrotate机制和原理]]></title>
-    <link href="http://lightxue.github.io/how-logrotate-works"/>
+    <link href="http://blog.lightxue.com/how-logrotate-works"/>
     <updated>2015-07-23T02:09:49+08:00</updated>
-    <id>http://lightxue.github.io/how-logrotate-works</id>
+    <id>http://blog.lightxue.com/how-logrotate-works</id>
     <content type="html"><![CDATA[<p>日志实在是太有用了，它记录了程序运行时各种信息。通过日志可以分析用户行为，记录运行轨迹，查找程序问题。可惜磁盘的空间是有限的，就像飞机里的黑匣子，记录的信息再重要也只能记录最后一段时间发生的事。为了节省空间和整理方便，日志文件经常需要按时间或大小等维度分成多份，删除时间久远的日志文件。这就是通常说的日志滚动(log rotation)。</p>
 
 <p>最近整理nginx日志，用了一个类Unix系统上的古老工具——logrotate，发现意外的好用。想了解这个工具的用法推荐看<a href="http://www.thegeekstuff.com/2010/07/logrotate-examples/">这里</a>。我了解了一下这个工具的运行机制和原理，觉得挺有趣的。</p>
@@ -71,13 +88,13 @@
 
 <p>Linux文件系统里文件和文件名的关系如下图。</p>
 
-<p><img src="http://lightxue.github.io/images/how-logrotate-works/inodes.png" alt="" /></p>
+<p><img src="http://blog.lightxue.com/images/how-logrotate-works/inodes.png" alt="" /></p>
 
 <p>目录也是文件，文件里存着文件名和对应的inode编号。通过这个inode编号可以查到文件的元数据和文件内容。文件的元数据有引用计数、操作权限、拥有者ID、创建时间、最后修改时间等等。文件件名并不在元数据里而是在目录文件中。因此文件改名、移动，都不会修改文件，而是修改目录文件。</p>
 
 <p>借《UNIX环境高级编程》里的图说一下进程打开文件的机制。</p>
 
-<p><img src="http://lightxue.github.io/images/how-logrotate-works/file_pointer.gif" alt="" /></p>
+<p><img src="http://blog.lightxue.com/images/how-logrotate-works/file_pointer.gif" alt="" /></p>
 
 <p>进程每新打开一个文件，系统会分配一个新的文件描述符给这个文件。文件描述符对应着一个文件表。表里面存着文件的状态信息（<code>O_APPEND</code>/<code>O_CREAT</code>/<code>O_DIRECT</code>&hellip;）、当前文件位置和文件的inode信息。系统会为每个进程创建独立的文件描述符和文件表，不同进程是不会共用同一个文件表。正因为如此，不同进程可以同时用不同的状态操作同一个文件的不同位置。文件表中存的是inode信息而不是文件路径，所以文件路径发生改变不会影响文件操作。</p>
 
@@ -128,9 +145,9 @@
   
   <entry>
     <title type="html"><![CDATA[[翻译]作为一个外国人，你对中国人怎么看？]]></title>
-    <link href="http://lightxue.github.io/as-a-foreigner-what-do-you-think-about-chinese-people"/>
+    <link href="http://blog.lightxue.com/as-a-foreigner-what-do-you-think-about-chinese-people"/>
     <updated>2015-06-19T01:26:18+08:00</updated>
-    <id>http://lightxue.github.io/as-a-foreigner-what-do-you-think-about-chinese-people</id>
+    <id>http://blog.lightxue.com/as-a-foreigner-what-do-you-think-about-chinese-people</id>
     <content type="html"><![CDATA[<p>来自dyr热心的投稿，感谢对Quora这个高质量回答的翻译。以下是正文。</p>
 
 <h4>Q: <a href="http://www.quora.com/As-a-foreigner-what-do-you-think-about-Chinese-People/">As a foreigner what do you think about Chinese People</a></h4>
@@ -174,9 +191,9 @@
   
   <entry>
     <title type="html"><![CDATA[关于barrier]]></title>
-    <link href="http://lightxue.github.io/about-barriers"/>
+    <link href="http://blog.lightxue.com/about-barriers"/>
     <updated>2015-04-10T16:50:24+08:00</updated>
-    <id>http://lightxue.github.io/about-barriers</id>
+    <id>http://blog.lightxue.com/about-barriers</id>
     <content type="html"><![CDATA[<p>再次收到John Smith的来稿，为了你这篇稿子，我停笔一年了呀。</p>
 
 <p>memory barrier内存屏障，一种非常底层的同步原语，是memory ordering的一部分。
@@ -327,9 +344,9 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
   
   <entry>
     <title type="html"><![CDATA[strlen的实现方法]]></title>
-    <link href="http://lightxue.github.io/strlen-implementation"/>
+    <link href="http://blog.lightxue.com/strlen-implementation"/>
     <updated>2013-12-07T22:23:46+08:00</updated>
-    <id>http://lightxue.github.io/strlen-implementation</id>
+    <id>http://blog.lightxue.com/strlen-implementation</id>
     <content type="html"><![CDATA[<p>感谢<a href="https://plus.google.com/u/0/102034236640204820044">John Smith</a>来稿，笔风太有趣了，能当本博的专栏作家吗？</p>
 
 <!--more-->
@@ -529,9 +546,9 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
   
   <entry>
     <title type="html"><![CDATA[使用PLY编写多功能计算器]]></title>
-    <link href="http://lightxue.github.io/write-swisscalc-by-ply"/>
+    <link href="http://blog.lightxue.com/write-swisscalc-by-ply"/>
     <updated>2013-11-24T22:00:52+08:00</updated>
-    <id>http://lightxue.github.io/write-swisscalc-by-ply</id>
+    <id>http://blog.lightxue.com/write-swisscalc-by-ply</id>
     <content type="html"><![CDATA[<p>最近用<a href="http://www.dabeaz.com/ply/ply.html">PLY</a>(Python Lex-Yacc)写了个Vim插件：<a href="https://github.com/lightxue/SwissCalc">SwissCalc</a>。借这个机会复习了下编译原理的一些知识。下面介绍一下用PLY写SwissCalc的过程吧。</p>
 
 <!--more-->
@@ -947,9 +964,9 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
   
   <entry>
     <title type="html"><![CDATA[Python中对象、类型、元类之间的关系]]></title>
-    <link href="http://lightxue.github.io/relationship-among-object-class-metaclass-in-python"/>
+    <link href="http://blog.lightxue.com/relationship-among-object-class-metaclass-in-python"/>
     <updated>2013-11-01T23:29:48+08:00</updated>
-    <id>http://lightxue.github.io/relationship-among-object-class-metaclass-in-python</id>
+    <id>http://blog.lightxue.com/relationship-among-object-class-metaclass-in-python</id>
     <content type="html"><![CDATA[<p>Python里的对象、类型和元类的关系很微妙也很有意思。</p>
 
 <p>1989年圣诞节期间，<a href="http://www.python.org/~guido/">上帝</a>很无聊，于是创造了一个世界。</p>
@@ -1090,7 +1107,7 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
 
 <h2>总结</h2>
 
-<p><img src="http://lightxue.github.io/images/python_types_map.png" title="对象、类型、元类之间的关系" alt="对象、类型、元类之间的关系" /></p>
+<p><img src="http://blog.lightxue.com/images/python_types_map.png" title="对象、类型、元类之间的关系" alt="对象、类型、元类之间的关系" /></p>
 
 <p><a href="http://www.cafepy.com/article/python_types_and_objects/python_types_and_objects.html">此文</a>把对象、类型、元类的关系画成了这幅图。三个框分别表示元类、类型、一般对象。把虚线看成产品与模具的关系，实线看成模具与原型的关系，是不是一目了然？</p>
 ]]></content>
@@ -1098,9 +1115,9 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
   
   <entry>
     <title type="html"><![CDATA[python断整数相加溢出]]></title>
-    <link href="http://lightxue.github.io/python-integer-overflow"/>
+    <link href="http://blog.lightxue.com/python-integer-overflow"/>
     <updated>2013-07-13T22:50:32+08:00</updated>
-    <id>http://lightxue.github.io/python-integer-overflow</id>
+    <id>http://blog.lightxue.com/python-integer-overflow</id>
     <content type="html"><![CDATA[<p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
 
 <!--more-->

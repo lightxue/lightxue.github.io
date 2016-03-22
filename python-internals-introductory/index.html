@@ -5,14 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: C - 0xFEE1C001</title>
+  <title>Python源码寻宝记——挖坑不埋 - 0xFEE1C001</title>
   <meta name="author" content="Light Xue">
 
   <!---->
   
-  <meta name="description" content="Category: C">
-  <!---->
-  <meta name="keywords" content="c, c++, python, linux, network, program, lightxue, Light Xue, develop, algorithm, fee1c001, '0xfee1c001', feelcool">
+  <meta name="description" content="发掘Python解释器中有趣的源码">
+  <!--<meta name="keywords" content="Python, python internals, how python works, python source code, python implenment, python源码剖析, python源码, python代码分析, python实现, python解释器实现">-->
+  <meta name="keywords" content="Python, python internals, how python works, python source code, python implenment, python源码剖析, python源码, python代码分析, python实现, python解释器实现">
 
 
 
@@ -22,7 +22,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.lightxue.comblog/categories/c/">
+  <link rel="canonical" href="http://blog.lightxue.com/python-internals-introductory">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -67,67 +67,99 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: C</h1>
+    
+      <h1 class="entry-title">Python源码寻宝记——挖坑不埋</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-22T20:34:21+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2016</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。</p>
 
-  
-  <h2>2015</h2>
+<p>记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。</p>
 
-<article>
-  
-<h1><a href="/about-barriers">关于barrier</a></h1>
-<time datetime="2015-04-10T16:50:24+08:00" pubdate><span class='month'>Apr</span> <span class='day'>10</span> <span class='year'>2015</span></time>
+<p>这个系列分析的Python源码版本是2.7.11和3.5.1，当前最新版。在<a href="https://www.python.org/downloads/">这里</a>可以找到下载链接。</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/c/'>C</a></span>
-</footer>
+<p>本文的目的是灌水+挖坑+索引这系列文章。开始寻宝吧。</p>
 
-
-</article>
-
-
-
-  
-  <h2>2013</h2>
-
-<article>
-  
-<h1><a href="/strlen-implementation">strlen的实现方法</a></h1>
-<time datetime="2013-12-07T22:23:46+08:00" pubdate><span class='month'>Dec</span> <span class='day'>07</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/c/'>C</a>, <a class='category' href='/blog/categories/algorithm/'>algorithm</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/python-integer-overflow">python断整数相加溢出</a></h1>
-<time datetime="2013-07-13T22:50:32+08:00" pubdate><span class='month'>Jul</span> <span class='day'>13</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/c/'>C</a>, <a class='category' href='/blog/categories/python/'>Python</a>, <a class='category' href='/blog/categories/algorithm/'>algorithm</a></span>
-</footer>
-
-
-</article>
-
+<p><a href="/python-internals-locate-source-code">Python源码寻宝记——地图</a></p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Light Xue</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-22T20:34:21+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2016</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/python/'>Python</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/how-logrotate-works" title="Previous Post: logrotate机制和原理">&laquo; logrotate机制和原理</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -177,7 +209,10 @@
       var disqus_shortname = '0xfee1c00l';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.lightxue.com/python-internals-introductory';
+        var disqus_url = 'http://blog.lightxue.com/python-internals-introductory';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Linux | 0xFEE1C001]]></title>
-  <link href="http://lightxue.github.io/blog/categories/linux/atom.xml" rel="self"/>
-  <link href="http://lightxue.github.io/"/>
-  <updated>2015-08-03T03:06:52+08:00</updated>
-  <id>http://lightxue.github.io/</id>
+  <link href="http://blog.lightxue.com/blog/categories/linux/atom.xml" rel="self"/>
+  <link href="http://blog.lightxue.com/"/>
+  <updated>2016-03-22T20:59:42+08:00</updated>
+  <id>http://blog.lightxue.com/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[logrotate机制和原理]]></title>
-    <link href="http://lightxue.github.io/how-logrotate-works"/>
+    <link href="http://blog.lightxue.com/how-logrotate-works"/>
     <updated>2015-07-23T02:09:49+08:00</updated>
-    <id>http://lightxue.github.io/how-logrotate-works</id>
+    <id>http://blog.lightxue.com/how-logrotate-works</id>
     <content type="html"><![CDATA[<p>日志实在是太有用了，它记录了程序运行时各种信息。通过日志可以分析用户行为，记录运行轨迹，查找程序问题。可惜磁盘的空间是有限的，就像飞机里的黑匣子，记录的信息再重要也只能记录最后一段时间发生的事。为了节省空间和整理方便，日志文件经常需要按时间或大小等维度分成多份，删除时间久远的日志文件。这就是通常说的日志滚动(log rotation)。</p>
 
 <p>最近整理nginx日志，用了一个类Unix系统上的古老工具——logrotate，发现意外的好用。想了解这个工具的用法推荐看<a href="http://www.thegeekstuff.com/2010/07/logrotate-examples/">这里</a>。我了解了一下这个工具的运行机制和原理，觉得挺有趣的。</p>

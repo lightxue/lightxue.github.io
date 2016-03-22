@@ -22,7 +22,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://lightxue.github.io/">
+  <link rel="canonical" href="http://blog.lightxue.com/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -53,7 +53,7 @@
   
 <form action="https://www.google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:lightxue.github.io" />
+    <input type="hidden" name="q" value="site:blog.lightxue.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -68,6 +68,52 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/python-internals-introductory">Python源码寻宝记——挖坑不埋</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-22T20:34:21+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2016</time>
+        
+         | <a href="/python-internals-introductory#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。</p>
+
+<p>记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。</p>
+
+<p>这个系列分析的Python源码版本是2.7.11和3.5.1，当前最新版。在<a href="https://www.python.org/downloads/">这里</a>可以找到下载链接。</p>
+
+<p>本文的目的是灌水+挖坑+索引这系列文章。开始寻宝吧。</p>
+
+<p><a href="/python-internals-locate-source-code">Python源码寻宝记——地图</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -397,6 +443,10 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/python-internals-introductory">Python源码寻宝记——挖坑不埋</a>
+      </li>
+    
+      <li class="post">
         <a href="/how-logrotate-works">logrotate机制和原理</a>
       </li>
     
@@ -412,10 +462,6 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
         <a href="/strlen-implementation">strlen的实现方法</a>
       </li>
     
-      <li class="post">
-        <a href="/write-swisscalc-by-ply">使用PLY编写多功能计算器</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -425,7 +471,7 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Light Xue
+  Copyright &copy; 2016 - Light Xue
 </p>
 
 </footer>

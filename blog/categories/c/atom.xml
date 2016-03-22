@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: C | 0xFEE1C001]]></title>
-  <link href="http://lightxue.github.io/blog/categories/c/atom.xml" rel="self"/>
-  <link href="http://lightxue.github.io/"/>
-  <updated>2015-08-03T03:06:52+08:00</updated>
-  <id>http://lightxue.github.io/</id>
+  <link href="http://blog.lightxue.com/blog/categories/c/atom.xml" rel="self"/>
+  <link href="http://blog.lightxue.com/"/>
+  <updated>2016-03-22T20:59:42+08:00</updated>
+  <id>http://blog.lightxue.com/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[关于barrier]]></title>
-    <link href="http://lightxue.github.io/about-barriers"/>
+    <link href="http://blog.lightxue.com/about-barriers"/>
     <updated>2015-04-10T16:50:24+08:00</updated>
-    <id>http://lightxue.github.io/about-barriers</id>
+    <id>http://blog.lightxue.com/about-barriers</id>
     <content type="html"><![CDATA[<p>再次收到John Smith的来稿，为了你这篇稿子，我停笔一年了呀。</p>
 
 <p>memory barrier内存屏障，一种非常底层的同步原语，是memory ordering的一部分。
@@ -147,9 +147,9 @@ y = 1;                  r2 = x;
   
   <entry>
     <title type="html"><![CDATA[strlen的实现方法]]></title>
-    <link href="http://lightxue.github.io/strlen-implementation"/>
+    <link href="http://blog.lightxue.com/strlen-implementation"/>
     <updated>2013-12-07T22:23:46+08:00</updated>
-    <id>http://lightxue.github.io/strlen-implementation</id>
+    <id>http://blog.lightxue.com/strlen-implementation</id>
     <content type="html"><![CDATA[<p>感谢<a href="https://plus.google.com/u/0/102034236640204820044">John Smith</a>来稿，笔风太有趣了，能当本博的专栏作家吗？</p>
 
 <!--more-->
@@ -284,9 +284,9 @@ y = 1;                  r2 = x;
   
   <entry>
     <title type="html"><![CDATA[python断整数相加溢出]]></title>
-    <link href="http://lightxue.github.io/python-integer-overflow"/>
+    <link href="http://blog.lightxue.com/python-integer-overflow"/>
     <updated>2013-07-13T22:50:32+08:00</updated>
-    <id>http://lightxue.github.io/python-integer-overflow</id>
+    <id>http://blog.lightxue.com/python-integer-overflow</id>
     <content type="html"><![CDATA[<p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
 
 <!--more-->
