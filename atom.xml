@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://blog.lightxue.com/atom.xml" rel="self"/>
   <link href="http://blog.lightxue.com/"/>
-  <updated>2016-03-22T21:08:20+08:00</updated>
+  <updated>2016-03-22T21:11:00+08:00</updated>
   <id>http://blog.lightxue.com/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -14,26 +14,9 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Python源码寻宝记——挖坑不埋]]></title>
-    <link href="http://blog.lightxue.com/python-internals-introductory"/>
-    <updated>2016-03-22T23:34:21+08:00</updated>
-    <id>http://blog.lightxue.com/python-internals-introductory</id>
-    <content type="html"><![CDATA[<p>作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。</p>
-
-<p>记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。</p>
-
-<p>这个系列分析的Python源码版本是2.7.11和3.5.1，当前最新版。在<a href="https://www.python.org/downloads/">这里</a>可以找到下载链接。</p>
-
-<p>本文的目的是灌水+挖坑+索引这系列文章。开始寻宝吧。</p>
-
-<p><a href="http://blog.lightxue.com/python-internals-locate-source-code">Python源码寻宝记——地图</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[python internals locate source code]]></title>
+    <title type="html"><![CDATA[Python源码寻宝记——地图]]></title>
     <link href="http://blog.lightxue.com/python-internals-locate-source-code"/>
-    <updated>2016-03-22T23:03:13+08:00</updated>
+    <updated>2016-03-22T23:44:21+08:00</updated>
     <id>http://blog.lightxue.com/python-internals-locate-source-code</id>
     <content type="html"><![CDATA[<p>如果读源码的方式是打开源码包，一个个文件，一行行开始读。这种阅读源码方式太枯燥了。另一种方式，对Python的设计有了基本的了解后，找感兴趣的部分去阅读。兴致高，目的性强，内容少，阅读的过程会轻松有趣得过。</p>
 
@@ -155,6 +138,23 @@
 <p>如果书里没有提到的地方，想快速定位源码位置，我的招式已经全部分用完了，剩下的只有问Google，问Stack Overflow，邮件大牛，或是自己去啃源码。</p>
 
 <p>以上就是Python寻宝需要的地图。看这个系列更多文章，请到<a href="http://blog.lightxue.com/python-internvals-introductory">Python源码寻宝记——挖坑不埋篇</a>。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Python源码寻宝记——挖坑不埋]]></title>
+    <link href="http://blog.lightxue.com/python-internals-introductory"/>
+    <updated>2016-03-22T23:34:21+08:00</updated>
+    <id>http://blog.lightxue.com/python-internals-introductory</id>
+    <content type="html"><![CDATA[<p>作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。</p>
+
+<p>记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。</p>
+
+<p>这个系列分析的Python源码版本是2.7.11和3.5.1，当前最新版。在<a href="https://www.python.org/downloads/">这里</a>可以找到下载链接。</p>
+
+<p>本文的目的是灌水+挖坑+索引这系列文章。开始寻宝吧。</p>
+
+<p><a href="http://blog.lightxue.com/python-internals-locate-source-code">Python源码寻宝记——地图</a></p>
 ]]></content>
   </entry>
   
