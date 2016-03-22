@@ -5,14 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>0xFEE1C001</title>
+  <title>python internals locate source code - 0xFEE1C001</title>
   <meta name="author" content="Light Xue">
 
   <!---->
   
-  <meta name="description" content="0xFEE1C001, Light Xue's blog">
-  <!---->
-  <meta name="keywords" content="c, c++, python, linux, network, program, lightxue, Light Xue, develop, algorithm, fee1c001, '0xfee1c001', feelcool">
+  <meta name="description" content="找到Python解释器特定逻辑的源码位置">
+  <!--<meta name="keywords" content="Python, python internals, how python works, python source code, python implenment, python locate source code, python find source code, python get source code, python 源码, python 定位, python 位置, python 代码">-->
+  <meta name="keywords" content="Python, python internals, how python works, python source code, python implenment, python locate source code, python find source code, python get source code, python 源码, python 定位, python 位置, python 代码">
 
 
 
@@ -22,7 +22,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.lightxue.com/">
+  <link rel="canonical" href="http://blog.lightxue.com/python-internals-locate-source-code">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -66,61 +66,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/python-internals-introductory">Python源码寻宝记——挖坑不埋</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-03-22T23:34:21+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2016</time>
-        
-         | <a href="/python-internals-introductory#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。</p>
-
-<p>记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。</p>
-
-<p>这个系列分析的Python源码版本是2.7.11和3.5.1，当前最新版。在<a href="https://www.python.org/downloads/">这里</a>可以找到下载链接。</p>
-
-<p>本文的目的是灌水+挖坑+索引这系列文章。开始寻宝吧。</p>
-
-<p><a href="/python-internals-locate-source-code">Python源码寻宝记——地图</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/python-internals-locate-source-code">python internals locate source code</a></h1>
+      <h1 class="entry-title">python internals locate source code</h1>
     
     
       <p class="meta">
@@ -138,14 +89,14 @@
 
 <time datetime="2016-03-22T23:03:13+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2016</time>
         
-         | <a href="/python-internals-locate-source-code#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>如果读源码的方式是打开源码包，一个个文件，一行行开始读。这种阅读源码方式太枯燥了。另一种方式，对Python的设计有了基本的了解后，找感兴趣的部分去阅读。兴致高，目的性强，内容少，阅读的过程会轻松有趣得过。</p>
+<div class="entry-content"><p>如果读源码的方式是打开源码包，一个个文件，一行行开始读。这种阅读源码方式太枯燥了。另一种方式，对Python的设计有了基本的了解后，找感兴趣的部分去阅读。兴致高，目的性强，内容少，阅读的过程会轻松有趣得过。</p>
 
 <p>对Python设计基本了解包括对总体架构设计，对象系统实现原理，字节码的生成和解释过程有大致的了解。哪天闲得不行，可以写写这方面的文章。</p>
 
@@ -266,67 +217,16 @@
 
 <p>以上就是Python寻宝需要的地图。看这个系列更多文章，请到<a href="/python-internvals-introductory">Python源码寻宝记——挖坑不埋篇</a>。</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-logrotate-works">logrotate机制和原理</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Light Xue</span></span>
 
-<time datetime="2015-07-23T02:09:49+08:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2015</time>
-        
-         | <a href="/how-logrotate-works#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>日志实在是太有用了，它记录了程序运行时各种信息。通过日志可以分析用户行为，记录运行轨迹，查找程序问题。可惜磁盘的空间是有限的，就像飞机里的黑匣子，记录的信息再重要也只能记录最后一段时间发生的事。为了节省空间和整理方便，日志文件经常需要按时间或大小等维度分成多份，删除时间久远的日志文件。这就是通常说的日志滚动(log rotation)。</p>
-
-<p>最近整理nginx日志，用了一个类Unix系统上的古老工具——logrotate，发现意外的好用。想了解这个工具的用法推荐看<a href="http://www.thegeekstuff.com/2010/07/logrotate-examples/">这里</a>。我了解了一下这个工具的运行机制和原理，觉得挺有趣的。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-logrotate-works">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/as-a-foreigner-what-do-you-think-about-chinese-people">[翻译]作为一个外国人，你对中国人怎么看？</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -338,261 +238,44 @@
   
 
 
-<time datetime="2015-06-19T01:26:18+08:00" pubdate data-updated="true">Jun 19<span>th</span>, 2015</time>
-        
-         | <a href="/as-a-foreigner-what-do-you-think-about-chinese-people#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>来自dyr热心的投稿，感谢对Quora这个高质量回答的翻译。以下是正文。</p>
-
-<h4>Q: <a href="http://www.quora.com/As-a-foreigner-what-do-you-think-about-Chinese-People/">As a foreigner what do you think about Chinese People</a></h4>
-
-<h4>A: <a href="http://www.quora.com/As-a-foreigner-what-do-you-think-about-Chinese-People/answer/Eric-Miller-17">Answer by Eric Miller</a></h4>
-
-<p>翻译这个的目的仅仅是分享一些真正的“老外”的看法给我周围对英语阅读有困难或者偷懒的人，并不代表我完全赞同作者观点（虽然大部分我觉得说的还是有道理，至少是我见过的现象）</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/as-a-foreigner-what-do-you-think-about-chinese-people">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2016-03-22T23:03:13+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2016</time>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/about-barriers">关于barrier</a></h1>
-    
-    
-      <p class="meta">
-        
 
-
-
-
-
-
-
-
+<span class="categories">
   
+    <a class='category' href='/blog/categories/python/'>Python</a>
+  
+</span>
 
 
-<time datetime="2015-04-10T16:50:24+08:00" pubdate data-updated="true">Apr 10<span>th</span>, 2015</time>
-        
-         | <a href="/about-barriers#disqus_thread">Comments</a>
-        
-      </p>
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>再次收到John Smith的来稿，为了你这篇稿子，我停笔一年了呀。</p>
-
-<p>memory barrier内存屏障，一种非常底层的同步原语，是memory ordering的一部分。
-使用内存屏障可以阻止编译器或cpu对内存的乱序访问，其中阻止编译时期重排的叫做
-compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
-
+      <div class="sharing">
+  
+  
+  
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/about-barriers">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  
-    <article>
+    
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/strlen-implementation">strlen的实现方法</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-12-07T22:23:46+08:00" pubdate data-updated="true">Dec 7<span>th</span>, 2013</time>
-        
-         | <a href="/strlen-implementation#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>感谢<a href="https://plus.google.com/u/0/102034236640204820044">John Smith</a>来稿，笔风太有趣了，能当本博的专栏作家吗？</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/strlen-implementation">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+        <a class="basic-alignment left" href="/how-logrotate-works" title="Previous Post: logrotate机制和原理">&laquo; logrotate机制和原理</a>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/write-swisscalc-by-ply">使用PLY编写多功能计算器</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-11-24T22:00:52+08:00" pubdate data-updated="true">Nov 24<span>th</span>, 2013</time>
-        
-         | <a href="/write-swisscalc-by-ply#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最近用<a href="http://www.dabeaz.com/ply/ply.html">PLY</a>(Python Lex-Yacc)写了个Vim插件：<a href="https://github.com/lightxue/SwissCalc">SwissCalc</a>。借这个机会复习了下编译原理的一些知识。下面介绍一下用PLY写SwissCalc的过程吧。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/write-swisscalc-by-ply">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/relationship-among-object-class-metaclass-in-python">Python中对象、类型、元类之间的关系</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-11-01T23:29:48+08:00" pubdate data-updated="true">Nov 1<span>st</span>, 2013</time>
-        
-         | <a href="/relationship-among-object-class-metaclass-in-python#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Python里的对象、类型和元类的关系很微妙也很有意思。</p>
-
-<p>1989年圣诞节期间，<a href="http://www.python.org/~guido/">上帝</a>很无聊，于是创造了一个世界。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/relationship-among-object-class-metaclass-in-python">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+        <a class="basic-alignment right" href="/python-internals-introductory" title="Next Post: Python源码寻宝记——挖坑不埋">Python源码寻宝记——挖坑不埋 &raquo;</a>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/python-integer-overflow">python断整数相加溢出</a></h1>
-    
-    
-      <p class="meta">
-        
+    </p>
+  </footer>
+</article>
 
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-13T22:50:32+08:00" pubdate data-updated="true">Jul 13<span>th</span>, 2013</time>
-        
-         | <a href="/python-integer-overflow#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在python解释器的源码里看到一段有趣的代码，它实现了python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。</p>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/python-integer-overflow">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
 <aside class="sidebar">
   
     <section>
@@ -625,6 +308,7 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -638,7 +322,10 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
       var disqus_shortname = '0xfee1c00l';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.lightxue.com/python-internals-locate-source-code';
+        var disqus_url = 'http://blog.lightxue.com/python-internals-locate-source-code';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

@@ -4,7 +4,7 @@
   <title><![CDATA[0xFEE1C001]]></title>
   <link href="http://blog.lightxue.com/atom.xml" rel="self"/>
   <link href="http://blog.lightxue.com/"/>
-  <updated>2016-03-22T20:59:42+08:00</updated>
+  <updated>2016-03-22T21:08:20+08:00</updated>
   <id>http://blog.lightxue.com/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Python源码寻宝记——挖坑不埋]]></title>
     <link href="http://blog.lightxue.com/python-internals-introductory"/>
-    <updated>2016-03-22T20:34:21+08:00</updated>
+    <updated>2016-03-22T23:34:21+08:00</updated>
     <id>http://blog.lightxue.com/python-internals-introductory</id>
     <content type="html"><![CDATA[<p>作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。</p>
 
@@ -27,6 +27,134 @@
 <p>本文的目的是灌水+挖坑+索引这系列文章。开始寻宝吧。</p>
 
 <p><a href="http://blog.lightxue.com/python-internals-locate-source-code">Python源码寻宝记——地图</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[python internals locate source code]]></title>
+    <link href="http://blog.lightxue.com/python-internals-locate-source-code"/>
+    <updated>2016-03-22T23:03:13+08:00</updated>
+    <id>http://blog.lightxue.com/python-internals-locate-source-code</id>
+    <content type="html"><![CDATA[<p>如果读源码的方式是打开源码包，一个个文件，一行行开始读。这种阅读源码方式太枯燥了。另一种方式，对Python的设计有了基本的了解后，找感兴趣的部分去阅读。兴致高，目的性强，内容少，阅读的过程会轻松有趣得过。</p>
+
+<p>对Python设计基本了解包括对总体架构设计，对象系统实现原理，字节码的生成和解释过程有大致的了解。哪天闲得不行，可以写写这方面的文章。</p>
+
+<p>感兴趣的部分源码怎么找？这个就是此文的主题了——如何找到特定逻辑的源码。</p>
+
+<h2>下载源码</h2>
+
+<p>Python官方给的下载源码的方式在<a href="https://docs.python.org/devguide/setup.html#getting-the-source-code">这里</a>。如果不想用Mercurial，也可以直接去<a href="https://www.python.org/downloads/">这里</a>下对应的版本的Gzipped source tarball。</p>
+
+<h2>目录结构</h2>
+
+<p>官方有源码目录的介绍，在<a href="https://docs.python.org/devguide/setup.html#directory-structure">这里</a>。重点说一下常见的目录。</p>
+
+<ul>
+<li>Grammar。EBNF描述的语法规则在这个目录下。</li>
+<li>Include。整个解释器所有的头文件放在这个目录下。</li>
+<li>Lib。纯Python实现的标准库。</li>
+<li>Modules。C实现的标准库。</li>
+<li>Objects。所有的内置类型的实现。</li>
+<li>Python。Python虚拟机的核心代码。</li>
+</ul>
+
+
+<h2>源码定位</h2>
+
+<p>感兴趣的地方不一样，定位的方式也不一样。介绍一下常见的几种。</p>
+
+<h3>语法定义</h3>
+
+<p>这个好说，去<code>Grammar</code>目录看语法规则吧。语法规则由Zephyr Abstract Syntax Definition Language定义，<a href="http://pages.cpsc.ucalgary.ca/~aycock/spark/">SPARK</a>解析的。</p>
+
+<h3>内置对象</h3>
+
+<p>找某个内置对象是怎么实现的，就直接去<code>Include</code>里看声明和<code>Object</code>看实现。</p>
+
+<p>比如想知道<code>list.sort()</code>是怎么实现的。那么在<code>Include/listobject.h</code>里可以知道列表是怎么用<code>ob_item</code>表示数据的，在<code>Objects/listobject.c</code>的<code>list_methods</code>里看到了<code>sort()</code>是由<code>listsort()</code>实现的.<code>listsort()</code>的实现刚好也在<code>Objects/listobject.c</code>里。就这样找到了<code>list.sort()</code>的源码了。</p>
+
+<h3>标准库</h3>
+
+<p>想找标准库的实现，分两种情况。大部分情况，标准库是纯Python实现的。还有一小部分标准库是C实现的。</p>
+
+<p>纯Python实现的标准库，可以不用直接去<code>Lib</code>下面找。Python内置了很好用的工具叫<code>inspect</code>。比如想知道<code>timeit.timeit()</code>的源码在哪，可以这么查。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">python</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">inspect</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">timeit</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsourcefile</span><span class="p">(</span><span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>inspect</code>只对纯Python实现的库有效，拿C实现的标准库一点招没有。</p>
+
+<p>C实现的标准库也有类似于<code>inspect</code>这种好用的方案，叫<a href="https://github.com/punchagan/cinspect">cinspect</a>，不过我没有尝试过。C的标准库不多，命名也比较容易懂。所以直接去<code>Modules</code>找一般很容易找到。</p>
+
+<p>如果不想对着文件名猜某个模块是不是在这实现，就需要工具来帮忙了。这里推荐一下速度比<code>grep</code>快得多的<a href="http://beyondgrep.com/">ack</a>。举个盒子，想找<code>time</code>的源码，可以执行这个命令。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; <span class="nb">cd </span>Modules
+</span><span class='line'>&gt;
+</span><span class='line'><span class="c"># Python 2</span>
+</span><span class='line'>&gt; ack <span class="s1">&#39;Py_InitModule3\(&quot;time&quot;&#39;</span>
+</span><span class='line'>timemodule.c
+</span><span class='line'>854:    <span class="nv">m</span> <span class="o">=</span> Py_InitModule3<span class="o">(</span><span class="s2">&quot;time&quot;</span>, time_methods, module_doc<span class="o">)</span>;
+</span><span class='line'>
+</span><span class='line'><span class="c"># Python 3</span>
+</span><span class='line'>&gt; ack <span class="s1">&#39;PyModuleDef&#39;</span> -A 5 | ack <span class="s1">&#39;&quot;time&quot;&#39;</span>
+</span><span class='line'>timemodule.c-1331-    <span class="s2">&quot;time&quot;</span>,
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>Modules/timemodule.c</code>就是<code>time</code>模块实现的地方。<code>Py_InitModule3</code>是Python 2 注册模块的宏，<code>PyModuleDef</code>是Python 3 模块定义的结构体的名字。这两个地方都要填上模块名作参数向解释器注册模块。所以这么搜模块名，一搜一个准。</p>
+
+<h3>语法实现</h3>
+
+<p>想知道某个语法怎么实现的去哪找呢？这时候就要去解读字节码，找到对应语法的字节码，并去<code>ceval.c</code>看具体实现。</p>
+
+<p>比如想看关键字<code>in</code>的实现，执行下面的代码可以看到<code>in</code>的字节码是<code>COMPARE_OP</code>。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">dis</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">exp</span> <span class="o">=</span> <span class="s">&#39;0 in (1, 2)&#39;</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">code</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;eval&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">dis</span><span class="o">.</span><span class="n">dis</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+</span><span class='line'>  <span class="mi">1</span>           <span class="mi">0</span> <span class="n">LOAD_CONST</span>               <span class="mi">0</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>              <span class="mi">3</span> <span class="n">LOAD_CONST</span>               <span class="mi">3</span> <span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</span><span class='line'>              <span class="mi">6</span> <span class="n">COMPARE_OP</span>               <span class="mi">6</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span>
+</span><span class='line'>              <span class="mi">9</span> <span class="n">RETURN_VALUE</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>具体各个字节码的意思可以去<a href="https://docs.python.org/2/library/dis.html#python-bytecode-instructions">这里</a>看解释。拿到了字节码后去<code>Python/ceval.c</code>里找<code>COMPARE_OP</code>的实现，会看到关键字<code>in</code>的实现在<code>PySequence_Contains</code>函数里。<code>ceval.c</code>里实现了字节码解析的eval loop，是整个源码中至关重要的部分。</p>
+
+<h3>其它情况</h3>
+
+<p>上面说的几种方法应该包含了大部分的情况，但也有些时候需要别的方法，比如找垃圾回收的实现。这里推荐一本深入剖析Python 2 源码的书，<a href="https://book.douban.com/subject/3117898/">《Python源码剖析》</a>。这本书详细介绍了Python源码里各个重要的地方，非常值得一看。</p>
+
+<p>如果书里没有提到的地方，想快速定位源码位置，我的招式已经全部分用完了，剩下的只有问Google，问Stack Overflow，邮件大牛，或是自己去啃源码。</p>
+
+<p>以上就是Python寻宝需要的地图。看这个系列更多文章，请到<a href="http://blog.lightxue.com/python-internvals-introductory">Python源码寻宝记——挖坑不埋篇</a>。</p>
 ]]></content>
   </entry>
   
