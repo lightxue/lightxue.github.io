@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "python internals locate source code"
-date: 2016-03-22 23:03:13 +0800
+title: Python源码寻宝记——地图
+date: 2016-03-22 23:44:21 +0800
 comments: true
 categories: Python
 keywords: Python, python internals, how python works, python source code, python implenment, python locate source code, python find source code, python get source code, python 源码, python 定位, python 位置, python 代码
@@ -102,5 +102,5 @@ timemodule.c-1331-    "time",
 
 如果书里没有提到的地方，想快速定位源码位置，我的招式已经全部分用完了，剩下的只有问Google，问Stack Overflow，邮件大牛，或是自己去啃源码。
 
-以上就是Python寻宝需要的地图。看这个系列更多文章，请到[Python源码寻宝记——挖坑不埋篇](/python-internvals-introductory)。
+以上就是Python寻宝需要的地图。看这个系列更多文章，请到[Python源码寻宝记——挖坑不埋篇](/python-internals-introductory)。
 
