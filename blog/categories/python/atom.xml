@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | 0xFEE1C001]]></title>
   <link href="http://blog.lightxue.com/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://blog.lightxue.com/"/>
-  <updated>2016-03-22T21:15:13+08:00</updated>
+  <updated>2016-03-22T22:31:24+08:00</updated>
   <id>http://blog.lightxue.com/</id>
   <author>
     <name><![CDATA[Light Xue]]></name>
@@ -23,6 +23,9 @@
 <p>对Python设计基本了解包括对总体架构设计，对象系统实现原理，字节码的生成和解释过程有大致的了解。哪天闲得不行，可以写写这方面的文章。</p>
 
 <p>感兴趣的部分源码怎么找？这个就是此文的主题了——如何找到特定逻辑的源码。</p>
+
+<!--more-->
+
 
 <h2>下载源码</h2>
 
@@ -74,7 +77,7 @@ inspect.getsourcefile(timeit.timeit)
 
 <p>C实现的标准库也有类似于<code>inspect</code>这种好用的方案，叫<a href="https://github.com/punchagan/cinspect">cinspect</a>，不过我没有尝试过。C的标准库不多，命名也比较容易懂。所以直接去<code>Modules</code>找一般很容易找到。</p>
 
-<p>如果不想对着文件名猜某个模块是不是在这实现，就需要工具来帮忙了。这里推荐一下速度比<code>grep</code>快得多的<a href="http://beyondgrep.com/">ack</a>。举个盒子，想找<code>time</code>的源码，可以执行这个命令。</p>
+<p>如果不想对着文件名猜某个模块是不是在这实现，就需要工具来帮忙了。这里推荐一下速度比<code>grep</code>快得多的<a href="http://beyondgrep.com/">ack</a>。举个例子，想找<code>time</code>的源码，可以执行这个命令。</p>
 
 <p>```bash</p>
 
@@ -135,6 +138,9 @@ dis.dis(code)
     <content type="html"><![CDATA[<p>作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。</p>
 
 <p>记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。</p>
+
+<!--more-->
+
 
 <p>这个系列分析的Python源码版本是2.7.11和3.5.1，当前最新版。在<a href="https://www.python.org/downloads/">这里</a>可以找到下载链接。</p>
 

@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>邮件发送实践经验 - 0xFEE1C001</title>
+  <meta name="author" content="Light Xue">
+
+  <!---->
+  
+  <meta name="description" content="邮件发送端实践经验技巧">
+  <!--<meta name="keywords" content="edm, mail server, mail best practices, 邮件, 垃圾邮件, 邮件实践, 邮件发送, 邮件经验">-->
+  <meta name="keywords" content="edm, mail server, mail best practices, 邮件, 垃圾邮件, 邮件实践, 邮件发送, 邮件经验">
+
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.lightxue.com/edm-practices-notes">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="0xFEE1C001" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!--<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">-->
+<!--<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">-->
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">0xFEE1C001</a></h1>
+  
+    <h2>Where there is a shell, there is a way</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:blog.lightxue.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">邮件发送实践经验</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-22T22:16:23+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2016</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在做邮件发送服务的时候遇到了种种问题，发现邮件发送有很多潜规则，并不是之前想象的按邮件的协议格式把邮件发给ESP就可以。查了一些资料，把一些实践的经验总结在这里。</p>
+
+<!--more-->
+
+
+<h2>ESP</h2>
+
+<p>邮件服务最重要的是把邮件送达给用户，这中间最大的困难是ESP(Email Service Provider)的反垃圾邮件的机制。</p>
+
+<p>据统计互联网90%的邮件是垃圾邮件。</p>
+
+<p>在国内，最饱受垃圾邮件骚扰也是用户量最大的ESP是QQ邮箱，反垃圾最严格的也是QQ邮箱。</p>
+
+<h2>信誉度</h2>
+
+<p>ESP的反垃圾策略是给邮件服务器评信誉度(reputation)。信誉度与邮件服务器的IP和域名都相关。</p>
+
+<p>每个ESP的反垃圾策略都是他们的技术核心，不会向外界泄露。不过反垃圾关注的重点都是类似的。</p>
+
+<p>发邮件的关键在于怎么提高信誉度，多做加分项，少做减分项。下面是几个监控信誉度的要点</p>
+
+<ul>
+<li>邮件是否都送达了</li>
+<li>发送速率是否被ESP限制了</li>
+<li>邮件是否因为错误地址退回</li>
+<li>是否被用户标成垃圾邮件或退订</li>
+<li>用户是否打开邮件，点开里面的链接</li>
+</ul>
+
+
+<h2>IP地址与发送量</h2>
+
+<p>我最终决定把邮件托管到第三方邮件服务(mailgun)，很多事不用操心了。但有一些事要注意。</p>
+
+<ul>
+<li>域名和IP要固定，IP最好是IPv4</li>
+<li>所在IP段要有好的信誉度，因为有些ESP会封整个IP段</li>
+<li>国内IP很少，大部分IP被列入黑名单了，这一点上用国外IP反而更好</li>
+</ul>
+
+
+<p>mailgun有共享IP和独立IP。共享IP是指使用的IP是固定的，不过是与其他人一起使用这个IP。独立IP是指这个IP是专用的，不与他人共享。</p>
+
+<p>使用共享IP和独立IP有个平衡点。如果发的量少用共享IP好一些，因为一个IP发送的邮件少，ESP会认为这个IP不是邮件服务的而是偶尔发送垃圾邮件的。</p>
+
+<p>如果量太大，ESP也会认为是在发送垃圾邮件，这需要使用独立IP，甚至是多个独立IP。</p>
+
+<p>mailgun推荐每周发送超过5万封邮件，应该使用独立IP；每天发送低于5000封，应该使用共享IP。mailgun主要针对的是国外的ESP，国内的需要考证。</p>
+
+<p>共享IP的问题在于用这个IP的其他人的行为是不可控的。出现过共享IP的某个mailgun用户发垃圾邮件给QQ邮箱，导致QQ邮箱拒收我的邮件。反馈后mailgun很快帮我找了IP。</p>
+
+<p>最好不同的业务使用不同的IP，这样低信誉度的业务不会影响到其它业务的发送。</p>
+
+<p>有了一个新的IP，需要先“热身”。先发送低速度的邮件再逐渐增加发送速率。发送过程关注ESP的反馈
+。如果一开始就发大量的邮件，ESP会拒收。我刚开始不知道，用10秒一封的速度发400多封邮件，有199封被QQ邮箱拒收了。后来有了换了新的IP，我换成10分钟一封，8分钟一封，5分钟一封，送达率为100%。</p>
+
+<p>网易邮箱的建议是每小时不超过3000封，每天不超过10万封。</p>
+
+<h2>域名</h2>
+
+<p>不要拿主域名发送edm，因为一但进了ESP黑名单，公司的正常邮件会受到影响。</p>
+
+<p>跟IP一样，不同的业务用不同的子域名，不要互相影响。</p>
+
+<p>邮件服务的域名和<code>from</code>字段里的域名最好一致。</p>
+
+<p>DNS托管服务要有良好的信誉。</p>
+
+<p>要设置反解域名。</p>
+
+<p>域名保存的鉴权信息要完善。</p>
+
+<p>WHOIS记录信息要完善。</p>
+
+<p>MX记录要有效</p>
+
+<h2>鉴权信息</h2>
+
+<p><code>SPF</code>，<code>DKIM</code>，<code>DomainKeys</code>，<code>SenderID</code>，这些要设置，增加ESP的信任。</p>
+
+<h2>邮件列表</h2>
+
+<p>尽最大努力保证收件地址是有效的。</p>
+
+<p>要有退订的功能。不然用户在ESP投诉后果很严重。</p>
+
+<h2>ESP反馈</h2>
+
+<p>维护邮件服务的信誉度很大程序是在正确处理拒收邮件。</p>
+
+<p>很多ESP会在第一次退信的时候，把你加入灰名单或是对你限速。如果你还在不断向无效地址发邮件，完全不听ESP的反馈，ESP会把你的邮件过滤掉。</p>
+
+<p>QQ邮件可以通过遍历号码来发邮件，所以他们对无效地址控制很严。</p>
+
+<p>QQ邮箱有反馈环，设置好后有人点击举报会反馈给发邮件者。</p>
+
+<p>QQ邮箱有他域互通的功能，在上面可以看到邮件的到达、阅读、删除和投诉的数据。</p>
+
+<h2>收件人反馈</h2>
+
+<p>收件人以下行为是积极的</p>
+
+<ul>
+<li>打开邮件</li>
+<li>转发邮件</li>
+<li>回复邮件</li>
+<li>加到白名单</li>
+<li>加到联系人</li>
+<li>标星邮件</li>
+<li>归档邮件</li>
+<li>打开链接</li>
+<li>鼠标滚动邮件页面</li>
+<li>点击显示图片</li>
+</ul>
+
+
+<p>收件人以下行为是消极的</p>
+
+<ul>
+<li>举报垃圾邮件</li>
+<li>删除邮件</li>
+<li>移至垃圾箱</li>
+<li>点击拒收</li>
+<li>将发件人添加至黑名单</li>
+<li>不打开邮件</li>
+</ul>
+
+
+<h2>邮件内容</h2>
+
+<ul>
+<li>根据用户个性化邮件内容</li>
+<li>邮件最好text和html都有</li>
+<li>链接、图片与文字的比例越小越好</li>
+<li>不要有错别字</li>
+<li>不建议用短url，邮件内容的链接域名要和发件人域名对应</li>
+<li>A/B test优化</li>
+<li>尽量避免发票、促销、免费、河蟹等关键字，奇怪符号，过多的红黄色、超大字体</li>
+<li>简洁的html代码，td tr布局。不要有js代码，也不要加附件</li>
+<li>邮件里的链接要安全合法</li>
+</ul>
+
+
+<p><strong>发送对用户有价值的内容</strong>是最重要的，其次才是技术问题。</p>
+
+<h2>工具</h2>
+
+<p>Return Path的信誉度查询 <a href="https://www.senderscore.org/">https://www.senderscore.org/</a></p>
+
+<p>黑名单查询 <a href="http://mxtoolbox.com/">http://mxtoolbox.com/</a></p>
+
+<hr />
+
+<h4>参考</h4>
+
+<p><a href="https://documentation.mailgun.com/best_practices.html">https://documentation.mailgun.com/best_practices.html</a></p>
+
+<p><a href="http://feedback.mail.163.com/FeedBack/feedback.do?method=index">http://feedback.mail.163.com/FeedBack/feedback.do?method=index</a></p>
+
+<p><a href="http://www.zhihu.com/question/19574247">http://www.zhihu.com/question/19574247</a></p>
+
+<p><a href="http://www.zhihu.com/question/19883607">http://www.zhihu.com/question/19883607</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Light Xue</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-22T22:16:23+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2016</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/server/'>server</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/how-logrotate-works" title="Previous Post: logrotate机制和原理">&laquo; logrotate机制和原理</a>
+      
+      
+        <a class="basic-alignment right" href="/python-internals-introductory" title="Next Post: Python源码寻宝记——挖坑不埋">Python源码寻宝记——挖坑不埋 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/python-internals-locate-source-code">Python源码寻宝记——地图篇</a>
+      </li>
+    
+      <li class="post">
+        <a href="/python-internals-introductory">Python源码寻宝记——挖坑不埋</a>
+      </li>
+    
+      <li class="post">
+        <a href="/edm-practices-notes">邮件发送实践经验</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-logrotate-works">logrotate机制和原理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/as-a-foreigner-what-do-you-think-about-chinese-people">[翻译]作为一个外国人，你对中国人怎么看？</a>
+      </li>
+    
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Light Xue
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = '0xfee1c00l';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.lightxue.com/edm-practices-notes';
+        var disqus_url = 'http://blog.lightxue.com/edm-practices-notes';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
