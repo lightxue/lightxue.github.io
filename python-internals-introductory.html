@@ -4,11 +4,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="zh"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>404 &mdash; 0xFEE1C001</title>
+  <title>Python源码寻宝记——挖坑不埋 &mdash; 0xFEE1C001</title>
   <meta name="author" content="Light Xue">
+  <meta name="description" content="发掘Python解释器中有趣的源码" />
 
   <link href="/feeds/atom.xml" type="application/atom+xml" rel="alternate"
         title="0xFEE1C001 Atom Feed" />
+
+
 
 
 
@@ -46,12 +49,48 @@
   <div id="main">
     <div id="content">
 <div>
-  <article role="article">
-    <header>
-      <h1 class="entry-title">404</h1>
-    </header>
-    <script type="text/javascript" src="//qzonestyle.gtimg.cn/qzone/hybrid/app/404/search_children.js" charset="utf-8"></script>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Python源码寻宝记——挖坑不埋</h1>
+    <p class="meta">
+<time datetime="2016-03-22T23:34:21+08:00" pubdate>2016-03-22</time>    </p>
+</header>
+
+  <div class="entry-content"><p>作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。</p>
+<p>记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。</p>
+
+
+<p>这个系列分析的Python源码版本是2.7.11和3.5.1，当前最新版。在<a href="https://www.python.org/downloads/">这里</a>可以找到下载链接。</p>
+<p>本文的目的是灌水+挖坑+索引这系列文章。开始寻宝吧。</p>
+<p><a href="/python-internals-locate-source-code">Python源码寻宝记——地图</a></p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        <a href="/author/light-xue">Light Xue</a>
+    </span>
+  </span>
+<time datetime="2016-03-22T23:34:21+08:00" pubdate>2016-03-22</time>  <!--<span class="categories">-->
+    <!--<a class='category' href='/category/python'>Python</a>-->
+  <!--</span>-->
+  <!---->
+  <!--<span class="categories">-->
+    <!---->
+    <!--<a class="category" href="/tag/python">Python</a>-->
+    <!---->
+  <!--</span>-->
+  <!---->
+</p><p class="meta">
+本作品由<a xmlns:cc="http://creativecommons.org/ns#" target="_blank" href="http://www.lightxue.com" property="cc:attributionName" rel="cc:attributionURL">www.lightxue.com</a>采用<a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/deed.zh">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可。
+<p>
+<div class="sharing">
+</div>    </footer>
   </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
 </div>
 <aside class="sidebar">
   <section>
@@ -112,6 +151,9 @@
   <script src="/theme/js/octopress.js" type="text/javascript"></script>
   <script type="text/javascript">
     var disqus_shortname = '0xfee1c001';
+    var disqus_identifier = '/python-internals-introductory';
+    var disqus_url = 'http://www.lightxue.com/python-internals-introductory';
+    var disqus_title = 'Python源码寻宝记——挖坑不埋';
     (function() {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
       dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';

@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>0xFEE1C001 - Light Xue</title><link href="http://www.lightxue.com/" rel="alternate"></link><link href="/feeds/light-xue.atom.xml" rel="self"></link><id>http://www.lightxue.com/</id><updated>2016-03-22T23:44:21+08:00</updated><entry><title>Python源码寻宝记——地图篇</title><link href="http://www.lightxue.com/python-internals-locate-source-code" rel="alternate"></link><published>2016-03-22T23:44:21+08:00</published><updated>2016-03-22T23:44:21+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2016-03-22:/python-internals-locate-source-code</id><summary type="html">&lt;p&gt;如果读源码的方式是打开源码包，一个个文件，一行行开始读。这种阅读源码方式太枯燥了。另一种方式，对Python的设计有了基本的了解后，找感兴趣的部分去阅读。兴致高，目的性强，内容少，阅读的过程会轻松有趣得多。&lt;/p&gt;
+&lt;p&gt;对Python设计基本了解包括对总体架构设计，对象系统实现原理，字节码的生成和解释过程有大致的了解。哪天闲得不行，可以写写这方面的文章。&lt;/p&gt;
+&lt;p&gt;感兴趣的部分源码怎么找？这个就是此文的主题了——如何找到特定逻辑的源码。&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;如果读源码的方式是打开源码包，一个个文件，一行行开始读。这种阅读源码方式太枯燥了。另一种方式，对Python的设计有了基本的了解后，找感兴趣的部分去阅读。兴致高，目的性强，内容少，阅读的过程会轻松有趣得多。&lt;/p&gt;
+&lt;p&gt;对Python设计基本了解包括对总体架构设计，对象系统实现原理，字节码的生成和解释过程有大致的了解。哪天闲得不行，可以写写这方面的文章。&lt;/p&gt;
+&lt;p&gt;感兴趣的部分源码怎么找？这个就是此文的主题了——如何找到特定逻辑的源码。&lt;/p&gt;
+
+
+&lt;h2&gt;下载源码&lt;/h2&gt;
+&lt;p&gt;Python官方给的下载源码的方式在&lt;a href="https://docs.python.org/devguide/setup.html#getting-the-source-code"&gt;这里&lt;/a&gt;。如果不想用Mercurial，也可以直接去&lt;a href="https://www.python.org/downloads/"&gt;这里&lt;/a&gt;下对应的版本的Gzipped source tarball。&lt;/p&gt;
+&lt;h2&gt;目录结构&lt;/h2&gt;
+&lt;p&gt;官方有源码目录的介绍，在&lt;a href="https://docs.python.org/devguide/setup.html#directory-structure"&gt;这里&lt;/a&gt;。重点说一下常见的目录。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Grammar。EBNF描述的语法规则在这个目录下。&lt;/li&gt;
+&lt;li&gt;Include。整个解释器所有的头文件放在这个目录下。&lt;/li&gt;
+&lt;li&gt;Lib。纯Python实现的标准库。&lt;/li&gt;
+&lt;li&gt;Modules。C实现的标准库。&lt;/li&gt;
+&lt;li&gt;Objects。所有的内置类型的实现。&lt;/li&gt;
+&lt;li&gt;Python。Python虚拟机的核心代码。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;源码定位&lt;/h2&gt;
+&lt;p&gt;感兴趣的地方不一样，定位的方式也不一样。介绍一下常见的几种。&lt;/p&gt;
+&lt;h3&gt;语法定义&lt;/h3&gt;
+&lt;p&gt;这个好说，去&lt;code&gt;Grammar&lt;/code&gt;目录看语法规则吧。语法规则由Zephyr Abstract Syntax Definition Language定义，&lt;a href="http://pages.cpsc.ucalgary.ca/~aycock/spark/"&gt;SPARK&lt;/a&gt;解析的。&lt;/p&gt;
+&lt;h3&gt;内置对象&lt;/h3&gt;
+&lt;p&gt;找某个内置对象是怎么实现的，就直接去&lt;code&gt;Include&lt;/code&gt;里看声明和&lt;code&gt;Object&lt;/code&gt;看实现。&lt;/p&gt;
+&lt;p&gt;比如想知道&lt;code&gt;list.sort()&lt;/code&gt;是怎么实现的。那么在&lt;code&gt;Include/listobject.h&lt;/code&gt;里可以知道列表是怎么用&lt;code&gt;ob_item&lt;/code&gt;表示数据的，在&lt;code&gt;Objects/listobject.c&lt;/code&gt;的&lt;code&gt;list_methods&lt;/code&gt;里看到了&lt;code&gt;sort()&lt;/code&gt;是由&lt;code&gt;listsort()&lt;/code&gt;实现的.&lt;code&gt;listsort()&lt;/code&gt;的实现刚好也在&lt;code&gt;Objects/listobject.c&lt;/code&gt;里。就这样找到了&lt;code&gt;list.sort()&lt;/code&gt;的源码了。&lt;/p&gt;
+&lt;h3&gt;标准库&lt;/h3&gt;
+&lt;p&gt;想找标准库的实现，分两种情况。大部分情况，标准库是纯Python实现的。还有一小部分标准库是C实现的。&lt;/p&gt;
+&lt;p&gt;纯Python实现的标准库，可以不用直接去&lt;code&gt;Lib&lt;/code&gt;下面找。Python内置了很好用的工具叫&lt;code&gt;inspect&lt;/code&gt;。比如想知道&lt;code&gt;timeit.timeit()&lt;/code&gt;的源码在哪，可以这么查。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;python&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;inspect&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;timeit&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;inspect&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getsourcefile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;timeit&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;timeit&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;inspect&lt;/code&gt;只对纯Python实现的库有效，拿C实现的标准库一点招没有。&lt;/p&gt;
+&lt;p&gt;C实现的标准库也有类似于&lt;code&gt;inspect&lt;/code&gt;这种好用的方案，叫&lt;a href="https://github.com/punchagan/cinspect"&gt;cinspect&lt;/a&gt;，不过我没有尝试过。C的标准库不多，命名也比较容易懂。所以直接去&lt;code&gt;Modules&lt;/code&gt;找一般很容易找到。&lt;/p&gt;
+&lt;p&gt;如果不想对着文件名猜某个模块是不是在这实现，就需要工具来帮忙了。这里推荐一下速度比&lt;code&gt;grep&lt;/code&gt;快得多的&lt;a href="http://beyondgrep.com/"&gt;ack&lt;/a&gt;。举个例子，想找&lt;code&gt;time&lt;/code&gt;的源码，可以执行这个命令。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; &lt;span class="nb"&gt;cd&lt;/span&gt; Modules
+&amp;gt; 
+&lt;span class="c1"&gt;# Python 2&lt;/span&gt;
+&amp;gt; ack &lt;span class="s1"&gt;&amp;#39;Py_InitModule3\(&amp;quot;time&amp;quot;&amp;#39;&lt;/span&gt;
+timemodule.c
+&lt;span class="m"&gt;854&lt;/span&gt;:    &lt;span class="nv"&gt;m&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; Py_InitModule3&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;time&amp;quot;&lt;/span&gt;, time_methods, module_doc&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Python 3&lt;/span&gt;
+&amp;gt; ack &lt;span class="s1"&gt;&amp;#39;PyModuleDef&amp;#39;&lt;/span&gt; -A &lt;span class="m"&gt;5&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; ack &lt;span class="s1"&gt;&amp;#39;&amp;quot;time&amp;quot;&amp;#39;&lt;/span&gt;
+timemodule.c-1331-    &lt;span class="s2"&gt;&amp;quot;time&amp;quot;&lt;/span&gt;,
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;Modules/timemodule.c&lt;/code&gt;就是&lt;code&gt;time&lt;/code&gt;模块实现的地方。&lt;code&gt;Py_InitModule3&lt;/code&gt;是Python 2 注册模块的宏，&lt;code&gt;PyModuleDef&lt;/code&gt;是Python 3 模块定义的结构体的名字。这两个地方都要填上模块名作参数向解释器注册模块。所以这么搜模块名，一搜一个准。&lt;/p&gt;
+&lt;h3&gt;语法实现&lt;/h3&gt;
+&lt;p&gt;想知道某个语法怎么实现的去哪找呢？这时候就要去解读字节码，找到对应语法的字节码，并去&lt;code&gt;ceval.c&lt;/code&gt;看具体实现。&lt;/p&gt;
+&lt;p&gt;比如想看关键字&lt;code&gt;in&lt;/code&gt;的实现，执行下面的代码可以看到&lt;code&gt;in&lt;/code&gt;的字节码是&lt;code&gt;COMPARE_OP&lt;/code&gt;。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;dis&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;exp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;0 in (1, 2)&amp;#39;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;code&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;compile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;exp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;eval&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dis&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dis&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;code&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="mi"&gt;1&lt;/span&gt;           &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="n"&gt;LOAD_CONST&lt;/span&gt;               &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+              &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="n"&gt;LOAD_CONST&lt;/span&gt;               &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+              &lt;span class="mi"&gt;6&lt;/span&gt; &lt;span class="n"&gt;COMPARE_OP&lt;/span&gt;               &lt;span class="mi"&gt;6&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ow"&gt;in&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+              &lt;span class="mi"&gt;9&lt;/span&gt; &lt;span class="n"&gt;RETURN_VALUE&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;具体各个字节码的意思可以去&lt;a href="https://docs.python.org/2/library/dis.html#python-bytecode-instructions"&gt;这里&lt;/a&gt;看解释。拿到了字节码后去&lt;code&gt;Python/ceval.c&lt;/code&gt;里找&lt;code&gt;COMPARE_OP&lt;/code&gt;的实现，会看到关键字&lt;code&gt;in&lt;/code&gt;的实现在&lt;code&gt;PySequence_Contains&lt;/code&gt;函数里。&lt;code&gt;ceval.c&lt;/code&gt;里实现了字节码解析的eval loop，是整个源码中至关重要的部分。&lt;/p&gt;
+&lt;h3&gt;其它情况&lt;/h3&gt;
+&lt;p&gt;上面说的几种方法应该包含了大部分的情况，但也有些时候需要别的方法，比如找垃圾回收的实现。这里推荐一本深入剖析Python 2 源码的书，&lt;a href="https://book.douban.com/subject/3117898/"&gt;《Python源码剖析》&lt;/a&gt;。这本书详细介绍了Python源码里各个重要的地方，非常值得一看。&lt;/p&gt;
+&lt;p&gt;如果书里没有提到的地方，想快速定位源码位置，我的招式已经全部分用完了，剩下的只有问Google，问Stack Overflow，邮件大牛，或是自己去啃源码。&lt;/p&gt;
+&lt;p&gt;以上就是Python寻宝需要的地图。看这个系列更多文章，请到&lt;a href="/python-internals-introductory"&gt;Python源码寻宝记——挖坑不埋篇&lt;/a&gt;。&lt;/p&gt;</content><category term="Python"></category></entry><entry><title>Python源码寻宝记——挖坑不埋</title><link href="http://www.lightxue.com/python-internals-introductory" rel="alternate"></link><published>2016-03-22T23:34:21+08:00</published><updated>2016-03-22T23:34:21+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2016-03-22:/python-internals-introductory</id><summary type="html">&lt;p&gt;作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。&lt;/p&gt;
+&lt;p&gt;记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;作为pythonista，不禁感慨Python的易用与强大。时不时会想，这个好用的语法是怎么实现的，那个神奇库是怎么回事。后来开始翻Python源码，读感兴趣的部分的实现时，像是找到了个四次元口袋。这里有奇思妙想的算法实现，也有精妙绝伦的性能优化，还有天马行空的语法原理。源码的风格也和Python所倡导的一样，简洁优雅，阅读的时候心情十分愉悦。&lt;/p&gt;
+&lt;p&gt;记下源码里有趣的地方，是件有意思的事。但按这个博客一直以来自娱自乐的尿性，注定了这个系列是只会把坑越挖越大。这里不要脸地承认了，这就是在挖坑。&lt;/p&gt;
+
+
+&lt;p&gt;这个系列分析的Python源码版本是2.7.11和3.5.1，当前最新版。在&lt;a href="https://www.python.org/downloads/"&gt;这里&lt;/a&gt;可以找到下载链接。&lt;/p&gt;
+&lt;p&gt;本文的目的是灌水+挖坑+索引这系列文章。开始寻宝吧。&lt;/p&gt;
+&lt;p&gt;&lt;a href="/python-internals-locate-source-code"&gt;Python源码寻宝记——地图&lt;/a&gt;&lt;/p&gt;</content><category term="Python"></category></entry><entry><title>邮件发送实践经验</title><link href="http://www.lightxue.com/edm-practices-notes" rel="alternate"></link><published>2016-03-22T22:16:23+08:00</published><updated>2016-03-22T22:16:23+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2016-03-22:/edm-practices-notes</id><summary type="html">&lt;p&gt;在做邮件发送服务的时候遇到了种种问题，发现邮件发送有很多技术之外的限制。这里把这些时间查资料和实践出来的一些经验总结在这里。&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;在做邮件发送服务的时候遇到了种种问题，发现邮件发送有很多技术之外的限制。这里把这些时间查资料和实践出来的一些经验总结在这里。&lt;/p&gt;
+
+
+&lt;h2&gt;ESP&lt;/h2&gt;
+&lt;p&gt;邮件服务最重要的是把邮件送达给用户，这中间最大的困难是ESP(Email Service Provider)的反垃圾邮件的机制。&lt;/p&gt;
+&lt;p&gt;据统计互联网90%的邮件是垃圾邮件。&lt;/p&gt;
+&lt;p&gt;在国内，最饱受垃圾邮件骚扰也是用户量最大的ESP是QQ邮箱，反垃圾最严格的也是QQ邮箱。&lt;/p&gt;
+&lt;h2&gt;信誉度&lt;/h2&gt;
+&lt;p&gt;ESP的反垃圾策略是给邮件服务器评信誉度(reputation)。信誉度与邮件服务器的IP和域名都相关。&lt;/p&gt;
+&lt;p&gt;每个ESP的反垃圾策略都是他们的技术核心，不会向外界泄露。不过反垃圾关注的重点都是类似的。&lt;/p&gt;
+&lt;p&gt;发邮件的关键在于怎么提高信誉度，多做加分项，少做减分项。下面是几个监控信誉度的要点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;邮件是否都送达了&lt;/li&gt;
+&lt;li&gt;发送速率是否被ESP限制了&lt;/li&gt;
+&lt;li&gt;邮件是否因为错误地址退回&lt;/li&gt;
+&lt;li&gt;是否被用户标成垃圾邮件或退订&lt;/li&gt;
+&lt;li&gt;用户是否打开邮件，点开里面的链接&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;IP地址与发送量&lt;/h2&gt;
+&lt;p&gt;我最终决定把邮件托管到第三方邮件服务(mailgun)，很多事不用操心了。但有一些事要注意。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;域名和IP要固定，IP最好是IPv4&lt;/li&gt;
+&lt;li&gt;所在IP段要有好的信誉度，因为有些ESP会封整个IP段&lt;/li&gt;
+&lt;li&gt;国内IP很少，大部分IP被列入黑名单了，这一点上用国外IP反而更好&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;mailgun有共享IP和独立IP。共享IP是指使用的IP是固定的，不过是与其他人一起使用这个IP。独立IP是指这个IP是专用的，不与他人共享。&lt;/p&gt;
+&lt;p&gt;使用共享IP和独立IP有个平衡点。如果发的量少用共享IP好一些，因为一个IP发送的邮件少，ESP会认为这个IP不是专门的邮件服务。&lt;/p&gt;
+&lt;p&gt;如果量太大，ESP也会认为是在发送垃圾邮件，这需要使用独立IP，甚至是多个独立IP。&lt;/p&gt;
+&lt;p&gt;mailgun推荐每周发送超过5万封邮件，应该使用独立IP；每天发送低于5000封，应该使用共享IP。mailgun主要针对的是国外的ESP，国内的需要考证。&lt;/p&gt;
+&lt;p&gt;共享IP的问题在于用这个IP的其他人的行为是不可控的。出现过共享IP的某个mailgun用户发垃圾邮件给QQ邮箱，导致QQ邮箱拒收我的邮件。反馈后mailgun很快帮我找了IP。&lt;/p&gt;
+&lt;p&gt;最好不同的业务使用不同的IP，这样低信誉度的业务不会影响到其它业务的发送。&lt;/p&gt;
+&lt;p&gt;有了一个新的IP，需要先“热身”。先发送低速度的邮件再逐渐增加发送速率。发送过程关注ESP的反馈
+。如果一开始就发大量的邮件，ESP会拒收。我刚开始不知道，用10秒一封的速度发400多封邮件，有199封被QQ邮箱拒收了。后来有了换了新的IP，发送速率慢慢从10分钟一封，8分钟一封，5分钟一封地逐步提高，送达率为100%。&lt;/p&gt;
+&lt;p&gt;网易邮箱的建议是每小时不超过3000封，每天不超过10万封。&lt;/p&gt;
+&lt;h2&gt;域名&lt;/h2&gt;
+&lt;p&gt;不要拿主域名发送EDM，因为一但进了ESP黑名单，公司的正常邮件会受到影响。&lt;/p&gt;
+&lt;p&gt;跟IP一样，不同的业务用不同的子域名，不要互相影响。&lt;/p&gt;
+&lt;p&gt;邮件服务的域名和&lt;code&gt;from&lt;/code&gt;字段里的域名最好一致。&lt;/p&gt;
+&lt;p&gt;DNS托管服务要有良好的信誉。&lt;/p&gt;
+&lt;p&gt;要设置反解域名。&lt;/p&gt;
+&lt;p&gt;域名保存的鉴权信息要完善。&lt;/p&gt;
+&lt;p&gt;WHOIS记录信息要完善。&lt;/p&gt;
+&lt;p&gt;MX记录要有效&lt;/p&gt;
+&lt;h2&gt;鉴权信息&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;SPF&lt;/code&gt;，&lt;code&gt;DKIM&lt;/code&gt;，&lt;code&gt;DomainKeys&lt;/code&gt;，&lt;code&gt;SenderID&lt;/code&gt;，这些要设置，增加ESP的信任。&lt;/p&gt;
+&lt;h2&gt;邮件列表&lt;/h2&gt;
+&lt;p&gt;尽最大努力保证收件地址是有效的。&lt;/p&gt;
+&lt;p&gt;要有退订的功能。不然用户在ESP投诉后果很严重。&lt;/p&gt;
+&lt;h2&gt;ESP反馈&lt;/h2&gt;
+&lt;p&gt;维护邮件服务的信誉度很大程序是在正确处理拒收邮件。&lt;/p&gt;
+&lt;p&gt;很多ESP会在第一次退信的时候，把你加入灰名单或是对你限速。如果你还在不断向无效地址发邮件，完全不听ESP的反馈，ESP会把你的邮件过滤掉。&lt;/p&gt;
+&lt;p&gt;QQ邮件可以通过遍历号码来发邮件，所以他们对无效地址控制很严。&lt;/p&gt;
+&lt;p&gt;QQ邮箱有反馈环，设置好后有人点击举报会反馈给发邮件者。&lt;/p&gt;
+&lt;p&gt;QQ邮箱有他域互通的功能，在上面可以看到邮件的到达、阅读、删除和投诉的数据。&lt;/p&gt;
+&lt;h2&gt;收件人反馈&lt;/h2&gt;
+&lt;p&gt;收件人以下行为是积极的&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;打开邮件&lt;/li&gt;
+&lt;li&gt;转发邮件&lt;/li&gt;
+&lt;li&gt;回复邮件&lt;/li&gt;
+&lt;li&gt;加到白名单&lt;/li&gt;
+&lt;li&gt;加到联系人&lt;/li&gt;
+&lt;li&gt;标星邮件&lt;/li&gt;
+&lt;li&gt;归档邮件&lt;/li&gt;
+&lt;li&gt;打开链接&lt;/li&gt;
+&lt;li&gt;鼠标滚动邮件页面&lt;/li&gt;
+&lt;li&gt;点击显示图片&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;收件人以下行为是消极的&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;举报垃圾邮件&lt;/li&gt;
+&lt;li&gt;删除邮件&lt;/li&gt;
+&lt;li&gt;移至垃圾箱&lt;/li&gt;
+&lt;li&gt;点击拒收&lt;/li&gt;
+&lt;li&gt;将发件人添加至黑名单&lt;/li&gt;
+&lt;li&gt;不打开邮件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;邮件内容&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;根据用户个性化邮件内容&lt;/li&gt;
+&lt;li&gt;邮件最好text和html都有&lt;/li&gt;
+&lt;li&gt;链接、图片与文字的比例越小越好&lt;/li&gt;
+&lt;li&gt;不要有错别字&lt;/li&gt;
+&lt;li&gt;不建议用短url，邮件内容的链接域名要和发件人域名对应&lt;/li&gt;
+&lt;li&gt;A/B test优化&lt;/li&gt;
+&lt;li&gt;尽量避免发票、促销、免费、河蟹等关键字，奇怪符号，过多的红黄色、超大字体&lt;/li&gt;
+&lt;li&gt;简洁的html代码，td tr布局。不要有js代码，也不要加附件&lt;/li&gt;
+&lt;li&gt;邮件里的链接要安全合法&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;发送对用户有价值的内容&lt;/strong&gt;是最重要的，其次才是技术问题。&lt;/p&gt;
+&lt;h2&gt;工具&lt;/h2&gt;
+&lt;p&gt;Return Path的信誉度查询 https://www.senderscore.org/&lt;/p&gt;
+&lt;p&gt;黑名单查询 http://mxtoolbox.com/&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4&gt;参考&lt;/h4&gt;
+&lt;p&gt;https://documentation.mailgun.com/best_practices.html&lt;/p&gt;
+&lt;p&gt;http://feedback.mail.163.com/FeedBack/feedback.do?method=index&lt;/p&gt;
+&lt;p&gt;http://www.zhihu.com/question/19574247&lt;/p&gt;
+&lt;p&gt;http://www.zhihu.com/question/19883607&lt;/p&gt;</content></entry><entry><title>logrotate机制和原理</title><link href="http://www.lightxue.com/how-logrotate-works" rel="alternate"></link><published>2015-07-23T02:09:49+08:00</published><updated>2015-07-23T02:09:49+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2015-07-23:/how-logrotate-works</id><summary type="html">&lt;p&gt;日志实在是太有用了，它记录了程序运行时各种信息。通过日志可以分析用户行为，记录运行轨迹，查找程序问题。可惜磁盘的空间是有限的，就像飞机里的黑匣子，记录的信息再重要也只能记录最后一段时间发生的事。为了节省空间和整理方便，日志文件经常需要按时间或大小等维度分成多份，删除时间久远的日志文件。这就是通常说的日志滚动(log rotation)。&lt;/p&gt;
+&lt;p&gt;最近整理nginx日志，用了一个类Unix系统上的古老工具——logrotate，发现意外的好用。想了解这个工具的用法推荐看&lt;a href="http://www.thegeekstuff.com/2010/07/logrotate-examples/"&gt;这里&lt;/a&gt;。我了解了一下这个工具的运行机制和原理，觉得挺有趣的。&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;日志实在是太有用了，它记录了程序运行时各种信息。通过日志可以分析用户行为，记录运行轨迹，查找程序问题。可惜磁盘的空间是有限的，就像飞机里的黑匣子，记录的信息再重要也只能记录最后一段时间发生的事。为了节省空间和整理方便，日志文件经常需要按时间或大小等维度分成多份，删除时间久远的日志文件。这就是通常说的日志滚动(log rotation)。&lt;/p&gt;
+&lt;p&gt;最近整理nginx日志，用了一个类Unix系统上的古老工具——logrotate，发现意外的好用。想了解这个工具的用法推荐看&lt;a href="http://www.thegeekstuff.com/2010/07/logrotate-examples/"&gt;这里&lt;/a&gt;。我了解了一下这个工具的运行机制和原理，觉得挺有趣的。&lt;/p&gt;
+
+
+&lt;h2&gt;运行机制&lt;/h2&gt;
+&lt;p&gt;logrotate在很多Linux发行版上都是默认安装的。系统会定时运行logrotate，一般是每天一次。系统是这么实现按天执行的。crontab会每天定时执行&lt;code&gt;/etc/cron.daily&lt;/code&gt;目录下的脚本，而这个目录下有个文件叫&lt;code&gt;logrotate&lt;/code&gt;。在centos上脚本内容是这样的：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;/usr/sbin/logrotate /etc/logrotate.conf &amp;gt;/dev/null &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="nv"&gt;EXITVALUE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$EXITVALUE&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+    /usr/bin/logger -t logrotate &lt;span class="s2"&gt;&amp;quot;ALERT exited abnormally with [&lt;/span&gt;&lt;span class="nv"&gt;$EXITVALUE&lt;/span&gt;&lt;span class="s2"&gt;]&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;可以看到这个脚本主要做的事就是以&lt;code&gt;/etc/logrotate.conf&lt;/code&gt;为配置文件执行了logrotate。就是这样实现了每天执行一次logrotate。&lt;/p&gt;
+&lt;p&gt;因为我的系统执行&lt;code&gt;/etc/cron.daily&lt;/code&gt;目录下的脚本不是我想滚动日志的时间，所以我把&lt;code&gt;/etc/cron.daily/logrotate&lt;/code&gt;拷了出来，改了一下logrotate配置文件的路径，然后在crontab里加上一条指定时间执行这个脚本的记录，自定义周期滚动日志就大功告成了。这种自定义的方式有两点要注意：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;配置文件里一定要配置&lt;code&gt;rotate 文件数目&lt;/code&gt;这个参数。如果不配置默认是0个，也就是只允许存在一份日志，刚切分出来的日志会马上被删除。多么痛的领悟，说多了都是泪。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;执行logrotate命令最好加&lt;code&gt;-f&lt;/code&gt;参数，不然有时候配置文件修改的内容不生效。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;很多程序的会用到logrotate滚动日志，比如nginx。它们安装后，会在&lt;code&gt;/etc/logrotate.d&lt;/code&gt;这个目录下增加自己的logrotate的配置文件。logrotate什么时候执行&lt;code&gt;/etc/logrotate.d&lt;/code&gt;下的配置呢？看到&lt;code&gt;/etc/logrotate.conf&lt;/code&gt;里这行，一切就不言而喻了。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;include /etc/logrotate.d
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;原理&lt;/h2&gt;
+&lt;p&gt;logrotate是怎么做到滚动日志时不影响程序正常的日志输出呢？logrotate提供了两种解决方案。&lt;/p&gt;
+&lt;h3&gt;Linux文件操作机制&lt;/h3&gt;
+&lt;p&gt;介绍一下相关的Linux下的文件操作机制。&lt;/p&gt;
+&lt;p&gt;Linux文件系统里文件和文件名的关系如下图。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="inodes" src="/images/how-logrotate-works/inodes.png"&gt;&lt;/p&gt;
+&lt;p&gt;目录也是文件，文件里存着文件名和对应的inode编号。通过这个inode编号可以查到文件的元数据和文件内容。文件的元数据有引用计数、操作权限、拥有者ID、创建时间、最后修改时间等等。文件件名并不在元数据里而是在目录文件中。因此文件改名、移动，都不会修改文件，而是修改目录文件。&lt;/p&gt;
+&lt;p&gt;借《UNIX环境高级编程》里的图说一下进程打开文件的机制。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="file pointer" src="/images/how-logrotate-works/file_pointer.gif"&gt;&lt;/p&gt;
+&lt;p&gt;进程每新打开一个文件，系统会分配一个新的文件描述符给这个文件。文件描述符对应着一个文件表。表里面存着文件的状态信息（&lt;code&gt;O_APPEND&lt;/code&gt;/&lt;code&gt;O_CREAT&lt;/code&gt;/&lt;code&gt;O_DIRECT&lt;/code&gt;...）、当前文件位置和文件的inode信息。系统会为每个进程创建独立的文件描述符和文件表，不同进程是不会共用同一个文件表。正因为如此，不同进程可以同时用不同的状态操作同一个文件的不同位置。文件表中存的是inode信息而不是文件路径，所以文件路径发生改变不会影响文件操作。&lt;/p&gt;
+&lt;h3&gt;方案1：create&lt;/h3&gt;
+&lt;p&gt;默认方案没有名字，姑且叫它create吧。因为这个方案会创建一个新的日志文件给程序输出日志，而且第二个方案名copytruncate是个配置项，与create配置项是互斥的。&lt;/p&gt;
+&lt;p&gt;这个方案的思路是重命名原日志文件，创建新的日志文件。详细步骤如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;重命名程序当前正在输出日志的程序。因为重命名只会修改目录文件的内容，而进程操作文件靠的是inode编号，所以并不影响程序继续输出日志。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建新的日志文件，文件名和原来日志文件一样。虽然新的日志文件和原来日志文件的名字一样，但是inode编号不一样，所以程序输出的日志还是往原日志文件输出。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;通过某些方式通知程序，重新打开日志文件。程序重新打开日志文件，靠的是文件路径而不是inode编号，所以打开的是新的日志文件。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;什么方式通知程序我重新打开日志呢，简单粗暴的方法是杀死进程重新打开。很多场景这种作法会影响在线的服务，于是有些程序提供了重新打开日志的接口，比如可以通过信号通知nginx。各种IPC方式都可以，前提是程序自身要支持这个功能。&lt;/p&gt;
+&lt;p&gt;有个地方值得一提，一个程序可能输出了多个需要滚动的日志文件。每滚动一个就通知程序重新打开所有日志文件不太划得来。有个&lt;code&gt;sharedscripts&lt;/code&gt;的参数，让程序把所有日志都重命名了以后，只通知一次。&lt;/p&gt;
+&lt;h3&gt;方案2：copytruncate&lt;/h3&gt;
+&lt;p&gt;如果程序不支持重新打开日志的功能，又不能粗暴地重启程序，怎么滚动日志呢？copytruncate的方案出场了。&lt;/p&gt;
+&lt;p&gt;这个方案的思路是把正在输出的日志拷(copy)一份出来，再清空(trucate)原来的日志。详细步骤如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;拷贝程序当前正在输出的日志文件，保存文件名为滚动结果文件名。这期间程序照常输出日志到原来的文件中，原来的文件名也没有变。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;清空程序正在输出的日志文件。清空后程序输出的日志还是输出到这个日志文件中，因为清空文件只是把文件的内容删除了，文件的inode编号并没有发生变化，变化的是元信息中文件内容的信息。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;结果上看，旧的日志内容存在滚动的文件里，新的日志输出到空的文件里。实现了日志的滚动。&lt;/p&gt;
+&lt;p&gt;这个方案有两个有趣的地方。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;文件清空并不影响到输出日志的程序的文件表里的文件位置信息，因为各进程的文件表是独立的。那么文件清空后，程序输出的日志应该接着之前日志的偏移位置输出，这个位置之前会被&lt;code&gt;\0&lt;/code&gt;填充才对。但实际上logroate清空日志文件后，程序输出的日志都是从文件开始处开始写的。这是怎么做到的？这个问题让我纠结了很久，直到某天灵光一闪，这不是logrotate做的，而是成熟的写日志的方式，都是用&lt;code&gt;O_APPEND&lt;/code&gt;的方式写的。如果程序没有用&lt;code&gt;O_APPEND&lt;/code&gt;方式打开日志文件，变会出现copytruncate后日志文件前面会被一堆&lt;code&gt;\0&lt;/code&gt;填充的情况。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;日志在拷贝完到清空文件这段时间内，程序输出的日志没有备份就清空了，这些日志不是丢了吗？是的，copytruncate有丢失部分日志内容的风险。所以能用create的方案就别用copytruncate。所以很多程序提供了通知我更新打开日志文件的功能来支持create方案，或者自己做了日志滚动，不依赖logrotate。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;总结&lt;/h2&gt;
+&lt;p&gt;logrotate是个优秀的日志滚动工具，它是用蜂蜜，川贝，桔梗，加上天山雪莲配制而成，不须冷藏，也没有防腐剂，除了毒性猛烈之外，味道还很好吃。实在是居家旅行、杀人灭口必备良药！&lt;/p&gt;</content><category term="Linux"></category><category term="shell"></category></entry><entry><title>使用PLY编写多功能计算器</title><link href="http://www.lightxue.com/write-swisscalc-by-ply" rel="alternate"></link><published>2013-11-24T22:00:52+08:00</published><updated>2013-11-24T22:00:52+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2013-11-24:/write-swisscalc-by-ply</id><summary type="html">&lt;p&gt;最近用&lt;a href="http://www.dabeaz.com/ply/ply.html"&gt;PLY&lt;/a&gt;(Python Lex-Yacc)写了个Vim插件：&lt;a href="https://github.com/lightxue/SwissCalc"&gt;SwissCalc&lt;/a&gt;。借这个机会复习了下编译原理的一些知识。下面介绍一下用PLY写SwissCalc的过程吧。&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;最近用&lt;a href="http://www.dabeaz.com/ply/ply.html"&gt;PLY&lt;/a&gt;(Python Lex-Yacc)写了个Vim插件：&lt;a href="https://github.com/lightxue/SwissCalc"&gt;SwissCalc&lt;/a&gt;。借这个机会复习了下编译原理的一些知识。下面介绍一下用PLY写SwissCalc的过程吧。&lt;/p&gt;
+
+
+&lt;h2&gt;程序结构&lt;/h2&gt;
+&lt;p&gt;程序分成3个部分&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;计算器(autoload/swisscalc.py)&lt;/li&gt;
+&lt;li&gt;内置函数(autoload/builtin.py)&lt;/li&gt;
+&lt;li&gt;用户自定义函数(autoload/custom.py)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这里主要分析计算器部分。&lt;/p&gt;
+&lt;p&gt;计算器部分有两个类：Parser和Calc。Parser是Calc的父类，对外提供计算器接口，处理一些传入参数，决定一些中间文件的路径等等。Calc是计算器的主要逻辑，一部分负责解释表达式，一部分负责管理计算器内部的逻辑，比如变量命令空间、函数命名空间、环境变量。Calc是计算器最有趣的地方。词法、语法解释就在解释表达式的部分。&lt;/p&gt;
+&lt;h2&gt;词法解析&lt;/h2&gt;
+&lt;p&gt;词法解析是把表达式(字符序列)识别成token序列。比如&lt;code&gt;v=13+13&lt;/code&gt;经过记法解析会变成&lt;code&gt;v&lt;/code&gt; &lt;code&gt;=&lt;/code&gt; &lt;code&gt;13&lt;/code&gt; &lt;code&gt;+&lt;/code&gt; &lt;code&gt;13&lt;/code&gt;。词法解析的过程归根结底是自动机扫描字符串。幸运的是现在的词法解析工具都不需要直接写自动机，大都是用正则表达式，PLY也一样。&lt;/p&gt;
+&lt;p&gt;PLY的词法解析在SwissCalc里这么用。&lt;/p&gt;
+&lt;p&gt;1.Parser里创建lexer对象，把lexer的命名空间指向类的命令空间。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;lexer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lex&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;lex&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;2.在Calc中，指定token的类型。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;tokens&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;ident&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;newline&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;binint&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;octint&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;hexint&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;decint&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;string&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;pointfloat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;exponentfloat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;add&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;subtract&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;multiply&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;divide&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;modulo&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;power&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;factorial&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;lshift&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;rshift&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;and&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;not&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;or&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;xor&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;assign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;addassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;subassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;mulassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;divassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;modassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;powassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;lsftassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;rsftassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;andassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;orassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;xorassign&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;lparen&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;rparen&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;comma&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;这里的变量名&lt;code&gt;tokens&lt;/code&gt;是固定的，别的名字PLY不认。&lt;/p&gt;
+&lt;p&gt;3.每种token类型写上对应的正则表达式。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;t_ignore&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39; &lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;t_ident&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;[a-zA-Z_][a-zA-Z0-9_]*&amp;#39;&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;t_hexint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;0[xX][0-9a-fA-F]+&amp;#39;&lt;/span&gt;
+    &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;
+
+&lt;span class="n"&gt;_escapeseq&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="se"&gt;\\&lt;/span&gt;&lt;span class="s1"&gt;.&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;_stringchar&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;[^&lt;/span&gt;&lt;span class="se"&gt;\\&lt;/span&gt;&lt;span class="s2"&gt;&amp;#39;]&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;[^&lt;/span&gt;&lt;span class="se"&gt;\\&lt;/span&gt;&lt;span class="s1"&gt;&amp;quot;]&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;_singlequote&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;#39;(&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt;|&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt;)*&amp;#39;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;_escapeseq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_stringchar&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="n"&gt;_doublequote&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;quot;(&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;|&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;)*&amp;quot;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;_escapeseq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_stringchar&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="n"&gt;_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;[rR]?((&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;)|(&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;))&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;_singlequote&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_doublequote&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nd"&gt;@TOKEN&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;t_string&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;rR&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;decode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;string-escape&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;t_error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;lexer&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;skip&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="ne"&gt;SyntaxError&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;illegal character &amp;#39;&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt;&amp;#39;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;
+
+&lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;这里变量名一样是有要求的。上面&lt;code&gt;tokens&lt;/code&gt;里的类型名前面加上&lt;code&gt;t_&lt;/code&gt;就是这个类型对应正则表达式的变量名。PLY会通过反射来查找这些变量。像&lt;code&gt;t_ident&lt;/code&gt;是变量名的表达式，符合这个正则的字符串会被切出来当变量名。切出来的数据还是字符串。&lt;/p&gt;
+&lt;p&gt;如果有些特殊需求，比如想让token类型是整数，那么就不能像&lt;code&gt;t_ident&lt;/code&gt;那样只写正则表达式了，要像&lt;code&gt;t_hexint&lt;/code&gt;那样写成函数。函数的docstring还是正则表达式，token是函数的返回值。这样在函数里就能把字符串类型转成整型了。像行号计数、错误处理都可以用函数去实现。&lt;/p&gt;
+&lt;p&gt;如果正则表达式比较复杂，写docstring不方便，可以像&lt;code&gt;t_string&lt;/code&gt;那样，先把正则表达式拼接好，然后再用&lt;code&gt;@TOKEN(_string)&lt;/code&gt;设置&lt;code&gt;t_string&lt;/code&gt;的正则表达式。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;t_ignore&lt;/code&gt;是PLY内置的token类型，这种token在解析到的时候会被丢弃。&lt;code&gt;t_error&lt;/code&gt;函数词法解析错误的时候调用。&lt;/p&gt;
+&lt;p&gt;经过这3个步骤词法分析就做好了。这个过程写正则挺有意思的。像字符串的表达式怎么识别内部有转义的引号这种有趣的问题是会有的(没有开玩笑哦，这个计算器是支持字符串的)。Parser里有个函数叫&lt;code&gt;_lexme&lt;/code&gt;，参数是表达式，结果是token序列。如果有兴趣可以用它了解一下词法分析的输入和输出。&lt;/p&gt;
+&lt;h2&gt;语法解析&lt;/h2&gt;
+&lt;p&gt;语法解析是写SwissCalc最爽的一部分。语法解析是根据token序列解析出语法树。有了语法树，对表达式的语义分析就容易很多了。如果不用PLY，自己手写语法分析还是挺有挑战的(如果打算这么做，推荐使用&lt;a href="http://en.wikipedia.org/wiki/Recursive_descent_parser"&gt;递归下降法&lt;/a&gt;，可操作性比较强)。用PLY整个语法解析的工作变得轻松不少，基本上只要操作产生式就行。根据产生式分析表达式过程PLY包办了，这是语法解析最复杂的部分，有很多坑。这里要感谢一下PLY，不然写个计算器都不知道要花我多少时间。&lt;/p&gt;
+&lt;p&gt;PLY支持&lt;a href="http://en.wikipedia.org/wiki/Recursive_descent_parser"&gt;LALR&lt;/a&gt;和&lt;a href="http://en.wikipedia.org/wiki/Simple_LR_parser"&gt;SLR&lt;/a&gt;，默认使用LALR，SwissCalc也是用的LALR。LALR和SLR怎么实现的我半懂不懂，感兴趣可以翻翻龙书，如果能翻得下去的话……&lt;/p&gt;
+&lt;p&gt;写&lt;a href="http://en.wikipedia.org/wiki/Formal_grammar"&gt;产生式&lt;/a&gt;也是件很有趣的事。PLY产生式用的&lt;a href="http://en.wikipedia.org/wiki/BNF_grammar"&gt;BNF&lt;/a&gt;，这里不详细介绍了。写产生式花了我一些时间，因为计算机到底需要哪些语法，功能要支持到什么程度就在这时候决定了。要让计算器强大一些，又要适当控制使用的复杂度，很多东西需要取舍。写完产生式其实计算器要做成什么样已经非常清晰了。&lt;/p&gt;
+&lt;p&gt;PLY的语法分析使用分这几个步骤。&lt;/p&gt;
+&lt;p&gt;1.在Parser里初始化yacc。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;yacc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;yacc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="n"&gt;debugfile&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debugfile&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="n"&gt;tabmodule&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;tabmodule&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="n"&gt;outputdir&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;basedir&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;2.编写产生式，像这样的。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="n"&gt;add&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="n"&gt;subtract&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="n"&gt;multiply&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="n"&gt;divide&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="n"&gt;xor&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="n"&gt;lshift&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="n"&gt;rshift&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="n"&gt;modulo&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="n"&gt;power&lt;/span&gt; &lt;span class="n"&gt;expression&lt;/span&gt;
+
+&lt;span class="n"&gt;expression&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;ident&lt;/span&gt;
+
+&lt;span class="nb"&gt;float&lt;/span&gt;      &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pointfloat&lt;/span&gt;
+           &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;exponentfloat&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;注意，产生式出来的语法树，叶子节点肯定要是词法解析的token，比如上面的&lt;code&gt;ident&lt;/code&gt; &lt;code&gt;pointfloat&lt;/code&gt; &lt;code&gt;exponentfloat&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;3.指定运算符的结合性和优先级。&lt;/p&gt;
+&lt;p&gt;结合性举个例子。&lt;code&gt;2 ** 2 ** 3&lt;/code&gt;，如果是这么算&lt;code&gt;(2 ** 2) ** 3&lt;/code&gt;，结果是64，那么&lt;code&gt;**&lt;/code&gt;是左结合的。如果&lt;code&gt;2 ** (2 ** 3)&lt;/code&gt;结果是256，那么&lt;code&gt;**&lt;/code&gt;是右结合的。结合性的指定决定了LALR解析时遇到同优先级的操作符是要shift还是要reduce。&lt;/p&gt;
+&lt;p&gt;优先级就不多说了，像我上面那么写&lt;code&gt;expression&lt;/code&gt;，需要指定乘法比加法优先级高才能确保&lt;code&gt;2 + 2 * 3&lt;/code&gt;这样的表达式结果是8而不是12。&lt;/p&gt;
+&lt;p&gt;结合性和优先级像下面这么指定。同理，变量名&lt;code&gt;precedence&lt;/code&gt;是固定的。优先级从低到高，同一个元组内的操作级等级相同，元组第一个元素是结合性。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;precedence&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;left&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;and&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;or&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;xor&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;left&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;lshift&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;rshift&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;left&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;add&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;subtract&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;left&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;multiply&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;divide&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;modulo&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;right&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;usub&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;uadd&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;not&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;left&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;factorial&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;left&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;power&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;4.每一条产生式编写对应的函数，做语义分析。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;p_expression_binop&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class="sd"&gt;    expression : expression add expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression subtract expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression multiply expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression divide expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression or expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression xor expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression and expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression lshift expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression rshift expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression modulo expression&lt;/span&gt;
+&lt;span class="sd"&gt;               | expression power expression&lt;/span&gt;
+&lt;span class="sd"&gt;    &amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;common_binops&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;common_binops&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]](&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;int_binops&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]](&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;像上面这个函数，函数名无所谓，但必须要有&lt;code&gt;p_&lt;/code&gt;开头，参数必须 只有一个，docstring是产生式。参数&lt;code&gt;p&lt;/code&gt;就像个元组一样，从0开始顺序对应表达式里的各个单词。上面的函数，就是计算器里的二元操作，&lt;code&gt;p[0]&lt;/code&gt;保存计算结果，&lt;code&gt;p[2]&lt;/code&gt;是运算符，&lt;code&gt;p[1]&lt;/code&gt;和&lt;code&gt;p[3]&lt;/code&gt;是需要操作的数。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;p_error&lt;/code&gt;在语法解析错误的时候会调用，在里面做一些错误处理。&lt;/p&gt;
+&lt;p&gt;以上4步就能把语法解析的工作做完了。设定SwissCalc世界观还是相当愉悦的。&lt;/p&gt;
+&lt;h2&gt;其它&lt;/h2&gt;
+&lt;p&gt;做完词法、语法解析的工作，计算器基本完工了。SwissCalc有一些特别的功能，值得说一下。&lt;/p&gt;
+&lt;h3&gt;命名空间&lt;/h3&gt;
+&lt;p&gt;SwissCalc的变量和函数命名空间各用一个字典来实现。内置函数和用户自定义函数用这种方式导进来。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;builtin&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;custom&lt;/span&gt;
+
+&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;vars&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;show_names&lt;/span&gt;
+&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;funcs&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;show_funcs&lt;/span&gt;
+&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ff&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;find_func&lt;/span&gt;
+&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;find_func&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;find_func&lt;/span&gt;
+&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;env&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;env&lt;/span&gt;
+&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;setenv&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setenv&lt;/span&gt;
+&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;help&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;helper&lt;/span&gt;
+
+&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;builtin&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;cusfuncs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;var&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;custom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;var&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;var&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;dir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;custom&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;callable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;custom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;var&lt;/span&gt;&lt;span class="p"&gt;))}&lt;/span&gt;
+&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cusfuncs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;上面代码中的&lt;code&gt;vars&lt;/code&gt; &lt;code&gt;funcs&lt;/code&gt; &lt;code&gt;help&lt;/code&gt;等都是一些需要操作变量和函数的命名空间的函数，以提供一些自省的功能。比如&lt;code&gt;help&lt;/code&gt;能看函数的帮助。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;helper&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class="sd"&gt;    help(func_name)&lt;/span&gt;
+
+&lt;span class="sd"&gt;    print the document of the function which name is func_name&lt;/span&gt;
+&lt;span class="sd"&gt;    &amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;func&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="ne"&gt;SyntaxError&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;function: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt; not found&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;doc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;funcs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="vm"&gt;__doc__&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;整数截断&lt;/h3&gt;
+&lt;p&gt;Python的整数精度是无限大的，只要内存存得下。但是SwissCalc为了模拟整数运算溢出的情况，要把整数截断成用户定义的字长。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;truncint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;val&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;signed&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_env&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;signed&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;bits&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_env&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;word&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bits&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nb"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bits&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;signed&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;bits&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;重定向标准输出&lt;/h3&gt;
+&lt;p&gt;内置函数和用户自定义函数有可能需要标准输出。但是SwissCalc是Vim插件，直接操作标准输出是不会输出到Vim的buffer里的。需要把标准输出的数据接住，然后用Vim提供的方式放到Vim的buffer里。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;cStringIO&lt;/span&gt;
+
+&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stdout&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mystdout&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cStringIO&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;StringIO&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exeval&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+    &lt;span class="n"&gt;yacc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;SyntaxError&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;err&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exeval&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;SyntaxError: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;err&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;Exception&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;err&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exeval&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;RuntimeError: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;err&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stdout&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;__stdout__&lt;/span&gt;
+&lt;span class="n"&gt;outstr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mystdout&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getvalue&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;总结&lt;/h2&gt;
+&lt;p&gt;以上就是怎么用PLY实现&lt;a href="https://github.com/lightxue/SwissCalc/tree/v1.0.0"&gt;SwissCalc v1.0.0&lt;/a&gt;(1.0.0? 我这么懒难道还会有更高版本吗？)。&lt;/p&gt;</content></entry><entry><title>Python中对象、类型、元类之间的关系</title><link href="http://www.lightxue.com/relationship-among-object-class-metaclass-in-python" rel="alternate"></link><published>2013-11-01T23:29:48+08:00</published><updated>2013-11-01T23:29:48+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2013-11-01:/relationship-among-object-class-metaclass-in-python</id><summary type="html">&lt;p&gt;Python里的对象、类型和元类的关系很微妙也很有意思。&lt;/p&gt;
+&lt;p&gt;1989年圣诞节期间，&lt;a href="http://www.python.org/~guido/"&gt;上帝&lt;/a&gt;很无聊，于是创造了一个世界。&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;Python里的对象、类型和元类的关系很微妙也很有意思。&lt;/p&gt;
+&lt;p&gt;1989年圣诞节期间，&lt;a href="http://www.python.org/~guido/"&gt;上帝&lt;/a&gt;很无聊，于是创造了一个世界。&lt;/p&gt;
+
+
+&lt;h2&gt;对象&lt;/h2&gt;
+&lt;p&gt;在这个世界的运转有几条定律。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;1.一切都是对象&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;对象(object)是这个世界的基本组成单位，所有的的事物都由对象构成。&lt;/p&gt;
+&lt;p&gt;什么是对象？不同的语言对对象的定义不尽相同。在Python的世界里，对象是数据的一种抽象表示。如果看了Python源码，事情就很好解释了，所有能通过PyObject类型的指针访问的都是对象。整数、字符串、元组、列表、字典、函数、模块、包，栈等都是对象。&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.python.org/doc/"&gt;圣经&lt;/a&gt;中&lt;a href="http://docs.python.org/2/reference/datamodel.html#objects-values-and-types"&gt;提到&lt;/a&gt;，&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;2.所有对象都有三种特性: id、类型、值&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;id是一个对象的编号，每个对象天生都有一个与众不同的编号(目前实现是对象的地址).用&lt;code&gt;id()&lt;/code&gt;能看到对象的id&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="mi"&gt;140657675012776&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;每个对象都会有类型(type)，类型就像是商品上印的生产厂商一样，标识自己被谁生产出来。用&lt;code&gt;type()&lt;/code&gt;可以看到对象的类型&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;int&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt; &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;span class="o"&gt;...&lt;/span&gt; 
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="nc"&gt;__main__&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;值是对象的价值所在。各种各样的对象保存着各种各样的值，Python的世界才会如此多彩。有的对象值永远不会变，叫不可变对象(immutable)；有的对象值可以变，叫可变对象(mutable)。&lt;/p&gt;
+&lt;p&gt;再说一次：Python世界里，一切都是对象&lt;/p&gt;
+&lt;h2&gt;类型&lt;/h2&gt;
+&lt;p&gt;类(class)就是生产出对象的模具(本文只讨论&lt;a href="http://docs.python.org/2/reference/datamodel.html#new-style-and-classic-classes"&gt;new-style class&lt;/a&gt;，classic class不在讨论范围内)。上面说到，每个对象天生都会有个铭牌，写着自己的类型。在Python里，类(class)和型(type)指的是同一件东西。汉字真是精妙，类和型放在一块念是多么的自然。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;3.每个对象都是由对应的类创建出来的&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;由这个定律很容易理解上文说到的，每个对象都有对应类型。类很像工厂里生产产品的模具，它负责对象的创建，决定了对象将被塑造成什么样，有什么属性、函数。&lt;/p&gt;
+&lt;p&gt;类可以继承和派生。虽然有点勉强，但姑且这么理解吧。类型B继承类型A，就像相当于模具B是以模型A为原型做出来的。生产出模具B的不是模具A，但模具B是模仿模具A而生产出来的，模具B生产出来的对象拥有模具A生产出来的对象类似的特性。模具B如果以模具A为原型生产出来，模具B身上会络上模具A的版权标识(☺就当做版权保护吧)。用&lt;code&gt;B.__bases__&lt;/code&gt;可以看模具B的印记。聪明的你可能已经注意到了，bases是复数，也就是说模具B可以以多个模具为原型，即多重继承。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt; &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;span class="o"&gt;...&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;B&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt; &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;span class="o"&gt;...&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="vm"&gt;__bases__&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;object&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="vm"&gt;__bases__&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="nc"&gt;__main__&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;gt;,)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;这里注意，模具的版权标识跟对象的类型不一样。每个对象都会有类型，表示自己是哪个模具生产出来的。而模具的版权标识只有模具才会有，标识表示的是这个模具的设计原型哪个模具，并不表示这个模具是由这个原理模具生产出来的。&lt;/p&gt;
+&lt;p&gt;这里必须要提一下一个特殊的模具，堪称模具之母的模具：object。这个object不是上文说的对象，上文的对象是一个抽象的概念，这里的object是一个具体的模具。所有的模具(除了object自己)沿着印记向上追溯，最后肯定到object。也就是说，所有除了object自己以外的类，都直接或间接地继承了object，无论是内置的(buit-in)还是自定义的(user-defined)。另一方面看，所有对象都直接或间接由模具object生产出来。如果有兴趣的话，用&lt;code&gt;type()&lt;/code&gt;把想查看对象的类型找到，再用&lt;code&gt;__baess__&lt;/code&gt;向上查找，最后肯定会到object。从源码的角度看，object就是上文提到的PyObject。这跟Python里所有的对象都能用PyObject的指针访问是有关系的。&lt;/p&gt;
+&lt;h2&gt;元类&lt;/h2&gt;
+&lt;p&gt;定律1说到，一切都是对象，类型也是对象。相比很多语言，这一点非常特别。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="mi"&gt;140548933792976&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;type&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;dir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;__class__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__delattr__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__dict__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__doc__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__format__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__getattribute__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__hash__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__init__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__module__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__new__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__reduce__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__reduce_ex__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__repr__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__setattr__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__sizeof__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__str__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__subclasshook__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__weakref__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;可以看到，类型也像其他对象那样，有id，有类型，有值。它可以当变量、类成员、函数参数。有意思吧？更有意思的在后头。&lt;/p&gt;
+&lt;p&gt;定律3说到，任何对象都是由类型创建出来的。那类型这种对象是由谁创建出来的呢？继续拿模具来说，生产模具的模具是谁呢？模具的模具：元类(metaclass)。元类跟其它模具不同之处在于，它生产出来的是不是一般的对象，是模具。是不是很神奇？有了元类我们就可以在程序运行时动态生成类了。我们可以根据各种数据和配置，动态地定制我们所需要的类。这里不讨论元类的使用方法。不过元类除了能生产模具之外，跟其它模具相比无其它特别的地方。&lt;/p&gt;
+&lt;p&gt;有趣的问题又来了，根据定律1，元类也是对象吧，元类是谁生产出来的？元类是模具，生产模具的模具还是元类，所以元类的类型也应该是元类。继续追问下去，元类的元类的元类也是元类……这么追溯到源头(再强调一下，本文只讨论new-style class)，就是一个特殊的元类：type。什么？type不是个查看类型的函数吗？通过&lt;code&gt;help(type)&lt;/code&gt;可以知道，type是个类。&lt;code&gt;type()&lt;/code&gt;如果传1个对象进去，type会返回这个对象的类型，这是我们熟知的用法；如果传3个对象进去，会生产出一个新的类出来。为什么会把两个功能放到一个类里做呢？可能是历史原因吧。再追问下去，这个终极的元类的类型是什么呢？上帝为了世界设定的统一，使type的类型是它自己。模具把自己生产出来了？这个下面讨论。&lt;/p&gt;
+&lt;p&gt;type引来的问题不只这些。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;object&lt;/span&gt;
+&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;object&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;
+&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;type&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;type&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;type&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="vm"&gt;__bases__&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;object&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;我们看到，type这个模具是object为原型造的，而生产object的模具却是type。鸡先生蛋还是蛋先生鸡？Python这个世界是运行在虚拟机上的。世界创建之初虚拟机就把type和object都造出来了。object一出世，生产的模具就写着是type；type一出世，模板的版权印记就记着object。他们一开始就存在了，无所谓谁先谁后。同理，type是不是自己把自己创建也来的问题也一样。&lt;/p&gt;
+&lt;h2&gt;总结&lt;/h2&gt;
+&lt;p&gt;&lt;img alt="对象、类型、元类之间的关系" src="/images/relationship-among-object-class-metaclass-in-python/python_types_map.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.cafepy.com/article/python_types_and_objects/python_types_and_objects.html"&gt;此文&lt;/a&gt;把对象、类型、元类的关系画成了这幅图。三个框分别表示元类、类型、一般对象。把虚线看成产品与模具的关系，实线看成模具与原型的关系，是不是一目了然？&lt;/p&gt;</content><category term="Python"></category></entry><entry><title>Python判断整数相加溢出</title><link href="http://www.lightxue.com/python-ingeger-overflow" rel="alternate"></link><published>2013-07-13T22:50:32+08:00</published><updated>2013-07-13T22:50:32+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2013-07-13:/python-ingeger-overflow</id><summary type="html">&lt;p&gt;在Python解释器的源码里看到一段有趣的代码，它实现了Python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;在Python解释器的源码里看到一段有趣的代码，它实现了Python两个整数相加时如果溢出则用更大的数据类型保存整数。具体代码的如下。&lt;/p&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;// Python解释器是C语言实现的&lt;/span&gt;
+&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="nf"&gt;int_add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PyIntObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;PyIntObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;CONVERT_TO_LONG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;CONVERT_TO_LONG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="cm"&gt;/* casts in the line below avoid undefined behaviour on overflow */&lt;/span&gt;
+    &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="p"&gt;)((&lt;/span&gt;&lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// 重点是这行&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;     &lt;span class="c1"&gt;// 和这行&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;PyInt_FromLong&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;PyLong_Type&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;tp_as_number&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;nb_add&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;((x^a) &amp;gt;= 0 || (x^b) &amp;gt;= 0)&lt;/code&gt;如果是false，就是发生了溢出。这段代码咋看跟溢出没关系，细看还是挺有名堂的。这个if要判断的是符号位。我们知道，整型的最后一个bit如果是0，那么这个数大于等于0；如果是1，这个数小于0。这个表达式的&lt;code&gt;&amp;gt;= 0&lt;/code&gt;判断的就是是否最后一个bit是否是0。&lt;/p&gt;
+&lt;p&gt;我们知道，^是异或运算：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;^&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+&lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;^&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;^&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;^&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;简而言之就是两个bit相同得0，两个bit不同得1。也就是说&lt;code&gt;((x^a) &amp;gt;= 0 || (x^b) &amp;gt;= 0)&lt;/code&gt;判断的是x与a的符号位相同或x与b的符号位相同。换而言之，x只要跟a和b任意一个数的符号位相同则为true。这跟溢出有什么关系？&lt;/p&gt;
+&lt;p&gt;我们知道，一个long能表达的数的范围是有限制的，两个long相加的情况不外乎下面6种：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;//  没有溢出的情况&lt;/span&gt;
+&lt;span class="err"&gt;非负数&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="err"&gt;非负数&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="err"&gt;非负数&lt;/span&gt;
+&lt;span class="err"&gt;非负数&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="err"&gt;负数&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="err"&gt;负&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="err"&gt;非负数&lt;/span&gt;
+&lt;span class="err"&gt;负数&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="err"&gt;非负数&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="err"&gt;负&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="err"&gt;非负数&lt;/span&gt;
+&lt;span class="err"&gt;负数&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="err"&gt;负数&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="err"&gt;负数&lt;/span&gt;
+
+&lt;span class="c1"&gt;// 溢出的情况&lt;/span&gt;
+&lt;span class="err"&gt;非负数&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="err"&gt;非负数&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="err"&gt;负数&lt;/span&gt;
+&lt;span class="err"&gt;负数&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="err"&gt;负数&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="err"&gt;非负数&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;可以看到，没有溢出的情况刚好x和a、b其中一个的符号位相同，而溢出的情况x跟a、b的符号位都不同。所以&lt;code&gt;((x^a) &amp;gt;= 0 || (x^b) &amp;gt;= 0)&lt;/code&gt;就刚好能判断出来a+b有没有溢出。&lt;/p&gt;
+&lt;p&gt;好神奇，我和我的小伙伴们都惊呆了！&lt;/p&gt;
+&lt;p&gt;有个地方不提一下这个讨论就不完整了。大家可能都注意到代码中的注释了：casts in the line below avoid undefined behaviour on overflow。在&lt;a href="http://en.wikipedia.org/wiki/Integer_overflow"&gt;wikipedia&lt;/a&gt;上看到的解释是这样的：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Since an arithmetic operation may produce a result larger than the maximum representable value, a potential error condition may result. In the C programming language, signed integer overflow causes undefined behavior, while unsigned integer overflow causes the number to be reduced modulo a power of two, meaning that unsigned integers "wrap around" on overflow.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;如果是a和b都是signed long，溢出后结果是不确定的，看编译器的实现。如果a或b是unsigned long(相加时另一个也会转成unsigned long)，相加结果再转回long跟上面讨论的6种情况就一样了。&lt;/p&gt;
+&lt;p&gt;最后留个问题吧，怎么判断两个数相减溢出了呢:-)&lt;/p&gt;
+&lt;p&gt;补充：&lt;/p&gt;
+&lt;p&gt;axu给了我另一种判断整数溢出的判断&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="c1"&gt;// overflow&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;细看其实思路跟上面说的一样，于是弃之不理。望仔看到这段代码后竟然想到去优化这它。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(((&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="c1"&gt;// overflow&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;确实比上面的解法有所提升。认真思考的心态值得学习，赞一下望仔。&lt;/p&gt;</content><category term="Python"></category><category term="C"></category><category term="algorithm"></category></entry></feed>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="zh"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>关于barrier &mdash; 0xFEE1C001</title>
+  <meta name="author" content="Light Xue">
+
+  <link href="/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+        title="0xFEE1C001 Atom Feed" />
+
+
+
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="/favicon.png" rel="icon">
+
+  <link href="/theme/css/main.css" media="screen, projection"
+        rel="stylesheet" type="text/css">
+
+  <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+  <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="/">0xFEE1C001</a></h1>
+    <h2>Where there is a shell, there is a way</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/feeds/atom.xml" rel="subscribe-atom">Atom</a></li>
+</ul>
+
+
+<ul class="main-navigation">
+    <li><a href="/">首页</a></li>
+    <li><a href="http://tools.lightxue.com">程序员工具</a></li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">关于barrier</h1>
+    <p class="meta">
+<time datetime="2015-04-10T16:50:24+08:00" pubdate>2015-04-10</time>    </p>
+</header>
+
+  <div class="entry-content"><p>再次收到John Smith的来稿，为了你这篇稿子，我停笔一年了呀。</p>
+<p>memory barrier内存屏障，一种非常底层的同步原语，是memory ordering的一部分。
+使用内存屏障可以阻止编译器或cpu对内存的乱序访问，其中阻止编译时期重排的叫做
+compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
+
+
+<h2>一. compiler barrier</h2>
+<div class="highlight"><pre><span></span><span class="cp">#define barrier()   __asm__ __volatile__(&quot;&quot;:::&quot;memory&quot;)</span>
+</pre></div>
+
+
+<p>看开源项目代码可能偶尔会看上面这样的内嵌汇编:</p>
+<ol>
+<li>内嵌汇编的格式为<code>__asm__</code> ("asm statement" : outputs : inputs : registers-modified)</li>
+<li><code>__asm__</code>用于提示编译器在这里插入汇编代码</li>
+<li><code>__volatile__</code>用于告诉编译器，严禁将此处的汇编代码和其他语句进行重排优化，所得即所见</li>
+<li><code>"":::</code>空的汇编语句，实际上不做任何事情</li>
+<li><code>"memory"</code>强制编译器假设RAM所有内存单元均被汇编指令修改，cpu的registers和cache的缓存数据将invalidate，cpu不得不在需要的时候重新从内存读取数据</li>
+<li>这条语句实际上不生成任何代码，但是会让gcc在barrier()之后刷新寄存器对变量的分配</li>
+</ol>
+<p>举个例子，考虑下面这段代码:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">task_struct</span> <span class="o">*</span><span class="n">owner</span><span class="p">;</span>
+
+    <span class="n">owner</span> <span class="o">=</span> <span class="n">lock</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">owner</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">mutex_spin_on_owner</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">owner</span><span class="p">))</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="cm">/* ... */</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>这段代码含义大概是自旋的去获取一个mutex, 乍看一下没有问题。但是optimize编译下，compiler发现
+循环里面完全没有去修改<code>lock-&gt;owner</code>嘛，没必要每次都取值。然后这段代码可能会优化为这样:</p>
+<div class="highlight"><pre><span></span><span class="n">owner</span> <span class="o">=</span> <span class="n">lock</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">owner</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">mutex_spin_on_owner</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">owner</span><span class="p">))</span>
+        <span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>这肯定不是你想要的结果，而且极有可能出现死循环。</p>
+<p>多线程情况下，编译器优化有可能会忽略<code>lock-&gt;owner</code>会被其他线程修改的情况。compiler barrier可以告诉编译器这里禁止优化，每次都从内存里面取<code>lock-&gt;owner</code>的值。修改后：</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">task_struct</span> <span class="o">*</span><span class="n">owner</span><span class="p">;</span>
+    <span class="n">barrier</span><span class="p">();</span>
+
+    <span class="n">owner</span> <span class="o">=</span> <span class="n">lock</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">owner</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">mutex_spin_on_owner</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">owner</span><span class="p">))</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="cm">/* ... */</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>注：这里不用compiler barrier，<code>onwer = (volatile struct task_struct *)(lock-&gt;owner)</code>;
+直接强转为volatile指针也可以解决问题。</p>
+<h2>二. memory barrier</h2>
+<div class="highlight"><pre><span></span><span class="cp">#define mb()        __asm__ __volatile__(&quot;lock; addl $0, 0(%%rsp)&quot;:::&quot;memory&quot;)</span>
+<span class="cp">#define rmb()       mb()</span>
+<span class="cp">#define wmb()       __asm__ __volatile__(&quot;&quot;:::&quot;memory&quot;)</span>
+</pre></div>
+
+
+<p>上面三个分别是读写内存屏障，读内存屏障和写内存屏障，在常见的x86/x64体系下，通常使用<code>lock</code>指令前缀
+加上一个空操作来实现memory barrier, 注意当然不能是真的nop指令，linux中采用<code>addl $0, 0(%esp)</code>。</p>
+<p>memory barrier可以保证运行时期的内存访问次序不被重排，保证程序的执行看上去满足顺序一致性。<code>volatile</code>关键字无法做到这一点，所以<code>volatile</code>不能保证是一个memory barrier。</p>
+<p>另外也不能指望独立的memory barrier能不做很多事情，mb往往是成对出现的。</p>
+<p>考虑下面这种情况，机器有两个核心，x和y都被初始化为0：</p>
+<div class="highlight"><pre><span></span><span class="n">CPU</span> <span class="mi">0</span>                   <span class="n">CPU</span> <span class="mi">1</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>                  <span class="n">r1</span> <span class="o">=</span> <span class="n">y</span><span class="p">;</span>
+<span class="n">mb</span><span class="p">();</span>                   <span class="n">mb</span><span class="p">();</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>                  <span class="n">r2</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+</pre></div>
+
+
+<p>CPU 0和CPU 1走完所有语句之后，总共有下面三种可能:</p>
+<ol>
+<li>
+<p>r1 == 0 &amp;&amp; r2 == 0: CPU 0在CPU1执行完之后才开始</p>
+</li>
+<li>
+<p>r1 == 0 &amp;&amp; r2 == 1: CPU 0和CPU 1物理上并行执行</p>
+</li>
+<li>
+<p>r1 == 1 &amp;&amp; r2 == 1: CPU 1在CPU 0执行完之后才开始</p>
+</li>
+</ol>
+<p>只有<code>r1 == 1 &amp;&amp; r2 == 0</code>这种输出被禁止了，如果这种情况真的出现，那你可以报警了。
+这种情况仅仅当CPU 0或CPU 1出现乱序执行的时候才会出现，mb就是为了禁止乱序执行的。
+目前Intel的CPU都遵循处理一致性，所有的写操作都遵循程序顺序，不会越过前面的读写操作，不过由于未来可能
+会采用更弱的内存一致性模型，在代码里面适当的加上mb保证内存事件的次序仍然是必要的。</p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        <a href="/author/john-smith">John Smith</a>
+    </span>
+  </span>
+<time datetime="2015-04-10T16:50:24+08:00" pubdate>2015-04-10</time>  <!--<span class="categories">-->
+    <!--<a class='category' href='/category/c'>C</a>-->
+  <!--</span>-->
+  <!---->
+  <!--<span class="categories">-->
+    <!---->
+    <!--<a class="category" href="/tag/c">C</a>-->
+    <!---->
+  <!--</span>-->
+  <!---->
+</p><p class="meta">
+本作品由<a xmlns:cc="http://creativecommons.org/ns#" target="_blank" href="http://www.lightxue.com" property="cc:attributionName" rel="cc:attributionURL">www.lightxue.com</a>采用<a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/deed.zh">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可。
+<p>
+<div class="sharing">
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  <section>
+    <h1>最新文章</h1>
+    <ul id="recent_posts">
+      <li class="post">
+          <a href="/python-internals-locate-source-code">Python源码寻宝记——地图篇</a>
+      </li>
+      <li class="post">
+          <a href="/python-internals-introductory">Python源码寻宝记——挖坑不埋</a>
+      </li>
+      <li class="post">
+          <a href="/edm-practices-notes">邮件发送实践经验</a>
+      </li>
+      <li class="post">
+          <a href="/how-logrotate-works">logrotate机制和原理</a>
+      </li>
+      <li class="post">
+          <a href="/as-a-foreigner-what-do-you-think-about-chinese-people">[翻译]作为一个外国人，你对中国人怎么看？</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>分类</h1>
+    <ul id="recent_posts">
+        <li><a href="/category/c">C</a></li>
+        <li><a href="/category/linux">Linux</a></li>
+        <li><a href="/category/misc">Misc</a></li>
+        <li><a href="/category/python">Python</a></li>
+    </ul>
+  </section>
+
+  <!--<section>-->
+  <!--<h1>Tags</h1>-->
+  <!---->
+    <!--<a href="/tag/python">Python</a>,-->
+  <!---->
+    <!--<a href="/tag/linux">Linux</a>,-->
+  <!---->
+    <!--<a href="/tag/shell">shell</a>,-->
+  <!---->
+    <!--<a href="/tag/c">C</a>,-->
+  <!---->
+    <!--<a href="/tag/algorithm">algorithm</a>-->
+  <!---->
+  <!--</section>-->
+
+
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo">    Copyright &copy;  2013&ndash;2016  Light Xue &mdash;
+  <span class="credit">Powered by <a target="_blank" href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="/theme/js/modernizr-2.0.js"></script>
+  <script src="/theme/js/ender.js"></script>
+  <script src="/theme/js/octopress.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var disqus_shortname = '0xfee1c001';
+    var disqus_identifier = '/about-barries';
+    var disqus_url = 'http://www.lightxue.com/about-barries';
+    var disqus_title = '关于barrier';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+</body>
+</html>
