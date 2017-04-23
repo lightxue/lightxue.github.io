@@ -1,7 +1,7 @@
 ---
 title: Python判断整数相加溢出
 date: 2013-07-13 22:50:32 +0800
-slug: python-ingeger-overflow
+slug: python-integer-overflow
 category: Python
 tags: Python, C, algorithm
 keywords: 溢出, Python, 源码, 整数溢出, integer overflow

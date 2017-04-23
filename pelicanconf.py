@@ -11,11 +11,13 @@ PATH = 'content'
 STATIC_PATHS = [
     'images',
     'extra/robots.txt',
-    'extra/favicon.png'
+    'extra/favicon.png',
+    'extra/CNAME',
 ]
 EXTRA_PATH_METADATA = {
     'extra/robots.txt':  {'path': 'robots.txt'},
-    'extra/favicon.png': {'path': 'favicon.png'}
+    'extra/favicon.png': {'path': 'favicon.png'},
+    'extra/CNAME': {'path': 'CNAME'},
 }
 
 DEFAULT_DATE_FORMAT = '%Y-%m-%d'
@@ -75,7 +77,7 @@ DEFAULT_PAGINATION = 10
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
-DISQUS_SITENAME = '0xfee1c001'
+DISQUS_SITENAME = '0xfee1c00l'
 
 PLUGIN_PATHS = ['plugins']
 PLUGINS = [
