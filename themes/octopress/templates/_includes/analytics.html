@@ -34,5 +34,15 @@
 
     ga('create', '{{GOOGLE_ANALYTICS}}');
     ga('send', 'pageview');
-</script>
+    </script>
+{% elif BAIDU_ANALYTICS %}
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?{{ BAIDU_ANALYTICS }}";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+    </script>
 {% endif %}

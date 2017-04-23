@@ -97,3 +97,5 @@ MARKDOWN = {
     },
     'output_format': 'html5',
 }
+
+BAIDU_ANALYTICS = '8a9edae11717cd734925510200712026'
