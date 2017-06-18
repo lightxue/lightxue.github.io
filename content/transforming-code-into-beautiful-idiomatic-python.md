@@ -212,7 +212,7 @@ def find(seq, target):
 
 `for`执行完所有的循环后就会执行`else`。
 
-译注：刚了解`for-else`语法时会困惑，什么情况下会执行到`else`里。有两种方法去理解`else`。传统的方法是把`for`看作`if`，当`for`后面的条件为`False`时执行`else`。其实条件为`False`时，就是`for`循环被`break`出去，把所有循环都跑完的时候。所以另一种方法就是把`else`记成`nobreak`，当`for`没有被`break`，那么循环结束时会进入到`else`。
+译注：刚了解`for-else`语法时会困惑，什么情况下会执行到`else`里。有两种方法去理解`else`。传统的方法是把`for`看作`if`，当`for`后面的条件为`False`时执行`else`。其实条件为`False`时，就是`for`循环没被`break`出去，把所有循环都跑完的时候。所以另一种方法就是把`else`记成`nobreak`，当`for`没有被`break`，那么循环结束时会进入到`else`。
 
 ## 遍历字典的key
 
