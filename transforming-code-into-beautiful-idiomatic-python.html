@@ -227,7 +227,7 @@
 
 
 <p><code>for</code>执行完所有的循环后就会执行<code>else</code>。</p>
-<p>译注：刚了解<code>for-else</code>语法时会困惑，什么情况下会执行到<code>else</code>里。有两种方法去理解<code>else</code>。传统的方法是把<code>for</code>看作<code>if</code>，当<code>for</code>后面的条件为<code>False</code>时执行<code>else</code>。其实条件为<code>False</code>时，就是<code>for</code>循环被<code>break</code>出去，把所有循环都跑完的时候。所以另一种方法就是把<code>else</code>记成<code>nobreak</code>，当<code>for</code>没有被<code>break</code>，那么循环结束时会进入到<code>else</code>。</p>
+<p>译注：刚了解<code>for-else</code>语法时会困惑，什么情况下会执行到<code>else</code>里。有两种方法去理解<code>else</code>。传统的方法是把<code>for</code>看作<code>if</code>，当<code>for</code>后面的条件为<code>False</code>时执行<code>else</code>。其实条件为<code>False</code>时，就是<code>for</code>循环没被<code>break</code>出去，把所有循环都跑完的时候。所以另一种方法就是把<code>else</code>记成<code>nobreak</code>，当<code>for</code>没有被<code>break</code>，那么循环结束时会进入到<code>else</code>。</p>
 <h2>遍历字典的key</h2>
 <div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;matthew&#39;</span><span class="p">:</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;rachel&#39;</span><span class="p">:</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;raymond&#39;</span><span class="p">:</span> <span class="s1">&#39;red&#39;</span><span class="p">}</span>
 
