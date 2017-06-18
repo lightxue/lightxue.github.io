@@ -34,3 +34,17 @@ a {
 .codehilite {
     margin: 0 1em;
 }
+
+#content blockquote {
+    font-style: normal;
+    font-size: 1em;
+    border-left-width: 10px;
+    background-color: rgba(102,128,153,0.05);
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 10px 15px;
+}
+
+#content blockquote p {
+    margin-bottom: 0.5em;
+}
