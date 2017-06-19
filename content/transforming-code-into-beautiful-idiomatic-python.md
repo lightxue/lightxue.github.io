@@ -1,5 +1,5 @@
 ---
-title: 让你的Python代码优雅又地道
+title: [译]让你的Python代码优雅又地道
 date: 2017-06-18 17:55:00 +0800
 slug: transforming-code-into-beautiful-idiomatic-python
 category: Python
