@@ -44,7 +44,7 @@ help:
 	@echo '                                                                          '
 
 init:
-	sudo $(PIP) install pelican
+	sudo $(PIP) install pelican markdown
 	sudo apt-get install -y ghp-import
 
 html:
