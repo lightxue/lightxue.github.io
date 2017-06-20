@@ -35,7 +35,8 @@
     ga('create', '{{GOOGLE_ANALYTICS}}');
     ga('send', 'pageview');
     </script>
-{% elif BAIDU_ANALYTICS %}
+{% endif %}
+{% if BAIDU_ANALYTICS %}
     <script>
     var _hmt = _hmt || [];
     (function() {
