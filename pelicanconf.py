@@ -13,11 +13,13 @@ STATIC_PATHS = [
     'extra/robots.txt',
     'extra/favicon.png',
     'extra/CNAME',
+    'extra/google-search-console.txt',
 ]
 EXTRA_PATH_METADATA = {
     'extra/robots.txt':  {'path': 'robots.txt'},
     'extra/favicon.png': {'path': 'favicon.png'},
     'extra/CNAME': {'path': 'CNAME'},
+    'extra/google-search-console.txt': {'path': 'google17d8cb936a6462eb.html'},
 }
 
 DEFAULT_DATE_FORMAT = '%Y-%m-%d'
