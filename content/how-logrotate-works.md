@@ -4,6 +4,7 @@ date: 2015-07-23 02:09:49 +0800
 slug: how-logrotate-works
 category: Linux
 tags: Linux, shell
+keywords: logrotate, linux logrotate, logrotate conf, logrotate config, copytruncate, copy trucate, logrotate copytruncate, logrotate配置, logrotate使用, log rotate, logrotate 机制, logrotate 原理
 ---
 
 日志实在是太有用了，它记录了程序运行时各种信息。通过日志可以分析用户行为，记录运行轨迹，查找程序问题。可惜磁盘的空间是有限的，就像飞机里的黑匣子，记录的信息再重要也只能记录最后一段时间发生的事。为了节省空间和整理方便，日志文件经常需要按时间或大小等维度分成多份，删除时间久远的日志文件。这就是通常说的日志滚动(log rotation)。
