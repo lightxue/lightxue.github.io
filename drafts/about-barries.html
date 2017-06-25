@@ -19,6 +19,7 @@
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <meta name="robots" content="noindex, nofollow" />
 
     <link href="/favicon.png" rel="icon">
 
@@ -59,7 +60,7 @@
 <p>memory barrier内存屏障，一种非常底层的同步原语，是memory ordering的一部分。
 使用内存屏障可以阻止编译器或cpu对内存的乱序访问，其中阻止编译时期重排的叫做
 compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
-
+<!-- more -->
 
 <h2>一. compiler barrier</h2>
 <div class="highlight"><pre><span></span><span class="cp">#define barrier()   __asm__ __volatile__(&quot;&quot;:::&quot;memory&quot;)</span>
@@ -176,10 +177,6 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
 </div>    </footer>
   </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
-  </section>
 </div>
 <aside class="sidebar">
   <section>
@@ -267,8 +264,8 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
     </script>
   <script type="text/javascript">
     var disqus_shortname = '0xfee1c00l';
-    var disqus_identifier = '/about-barries';
-    var disqus_url = 'http://www.lightxue.com/about-barries';
+    var disqus_identifier = '/drafts/about-barries';
+    var disqus_url = 'http://www.lightxue.com/drafts/about-barries';
     var disqus_title = '关于barrier';
     (function() {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
