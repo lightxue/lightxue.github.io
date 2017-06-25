@@ -14,6 +14,8 @@ description: 如何写出优雅的、地道、pythonic的的python代码
 > 
 > —— Edsger Wybe Dijkstra
 
+<!-- more -->
+
 在Python社区文化的浇灌下，演化出了一种独特的代码风格，去指导如何正确地使用Python，这就是常说的pythonic。一般说地道(idiomatic)的python代码，就是指这份代码很pythonic。Python的语法和标准库设计，处处契合着pythonic的思想。而且Python社区十分注重编码风格一的一致性，他们极力推行和处处实践着pythonic。所以经常能看到基于某份代码P vs NP (pythonic vs non-pythonic)的讨论。pythonic的代码简练，明确，优雅，绝大部分时候执行效率高。阅读pythonic的代码能体会到“代码是写给人看的，只是顺便让机器能运行”畅快。
 
 然而什么是pythonic，就像什么是地道的汉语一样，切实存在但标准模糊。`import this`可以看到Tim Peters提出的Python之禅，它提供了指导思想。许多初学者都看过它，深深赞同它的理念，但是实践起来又无从下手。PEP 8给出的不过是编码规范，对于实践pythonic还远远不够。如果你正被如何写出pythonic的代码而困扰，或许这份笔记能给你帮助。
