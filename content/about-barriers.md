@@ -5,6 +5,7 @@ author: John Smith
 slug: about-barries
 category: C
 tags: C
+status: draft
 ---
 
 再次收到John Smith的来稿，为了你这篇稿子，我停笔一年了呀。
