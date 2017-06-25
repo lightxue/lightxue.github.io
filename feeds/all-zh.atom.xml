@@ -365,12 +365,13 @@ After def: {&amp;#39;inner&amp;#39;: &amp;lt;function outer.&amp;lt;locals&amp;g
 &lt;p&gt;如果说优雅也有缺点的话，那就是你需要艰巨的工作才能得到它，需要良好的教育才能欣赏它。&lt;/p&gt;
 &lt;p&gt;—— Edsger Wybe Dijkstra&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;在Python社区文化的浇灌下，演化出了一种独特的代码风格，去指导如何正确地使用Python，这就是常说的pythonic。一般说地道(idiomatic)的python代码，就是指这份代码很pythonic。Python的语法和标准库设计，处处契合着pythonic的思想。而且Python社区十分注重编码风格一的一致性，他们极力推行和处处实践着pythonic。所以经常能看到基于某份代码P vs NP (pythonic vs non-pythonic)的讨论。pythonic的代码简练，明确，优雅，绝大部分时候执行效率高。阅读pythonic的代码能体会到“代码是写给人看的，只是顺便让机器能运行”畅快。&lt;/p&gt;
-&lt;p&gt;然而什么是pythonic，就像什么是地道的汉语一样，切实存在但标准模糊。&lt;code&gt;import this&lt;/code&gt;可以看到Tim Peters提出的Python之禅，它提供了指导思想。许多初学者都看过它，深深赞同它的理念，但是实践起来又无从下手。PEP 8给出的不过是编码规范，对于实践pythonic还远远不够。如果你正被如何写出pythonic的代码而困扰，或许这份笔记能给你帮助 …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;译序&lt;/h2&gt;
+</summary><content type="html">&lt;h2&gt;译序&lt;/h2&gt;
 &lt;blockquote&gt;
 &lt;p&gt;如果说优雅也有缺点的话，那就是你需要艰巨的工作才能得到它，需要良好的教育才能欣赏它。&lt;/p&gt;
 &lt;p&gt;—— Edsger Wybe Dijkstra&lt;/p&gt;
 &lt;/blockquote&gt;
+
+
 &lt;p&gt;在Python社区文化的浇灌下，演化出了一种独特的代码风格，去指导如何正确地使用Python，这就是常说的pythonic。一般说地道(idiomatic)的python代码，就是指这份代码很pythonic。Python的语法和标准库设计，处处契合着pythonic的思想。而且Python社区十分注重编码风格一的一致性，他们极力推行和处处实践着pythonic。所以经常能看到基于某份代码P vs NP (pythonic vs non-pythonic)的讨论。pythonic的代码简练，明确，优雅，绝大部分时候执行效率高。阅读pythonic的代码能体会到“代码是写给人看的，只是顺便让机器能运行”畅快。&lt;/p&gt;
 &lt;p&gt;然而什么是pythonic，就像什么是地道的汉语一样，切实存在但标准模糊。&lt;code&gt;import this&lt;/code&gt;可以看到Tim Peters提出的Python之禅，它提供了指导思想。许多初学者都看过它，深深赞同它的理念，但是实践起来又无从下手。PEP 8给出的不过是编码规范，对于实践pythonic还远远不够。如果你正被如何写出pythonic的代码而困扰，或许这份笔记能给你帮助。&lt;/p&gt;
 &lt;p&gt;Raymond Hettinger是Python核心开发者，本文提到的许多特性都是他开发的。同时他也是Python社区热忱的布道师，不遗余力地传授pythonic之道。这篇文章是网友Jeff Paine整理的他在2013年美国的PyCon的&lt;a href="http://pyvideo.org/pycon-us-2013/transforming-code-into-beautiful-idiomatic-pytho.html"&gt;演讲&lt;/a&gt;的笔记。&lt;/p&gt;
