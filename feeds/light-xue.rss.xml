@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0"><channel><title>0xFEE1C001 - Light Xue</title><link>http://www.lightxue.com/</link><description>Where there is a shell, there is a way</description><lastBuildDate>Mon, 26 Jun 2017 01:00:00 +0800</lastBuildDate><item><title>简单地理解Python的装饰器</title><link>http://www.lightxue.com/understand-python-decorator-the-easy-way</link><description>&lt;p&gt;Python有大量强大又贴心的特性，如果要列个最受欢迎排行榜，那么装饰器绝对会在其中。&lt;/p&gt;
-&lt;p&gt;初识装饰器，会感觉到优雅且神奇，想亲手实现时却总有距离感，就像深闺的冰美人一般。这往往是因为理解装饰器时把其他的一些概念混杂在一起了。待我抚去层层面纱，你会看到纯粹的装饰器其实蛮简单直率的。&lt;/p&gt;
+&lt;p&gt;刚开始接触装饰器时，会觉得代码写起来不多，但语法难以理解。其实装饰器的语法本身挺简单的，觉得复杂是因为同时把其它的概念混在一起了。下面我们一起抛去无关的概念，简单地理解Python的装饰器。&lt;/p&gt;
 </description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Light Xue</dc:creator><pubDate>Mon, 26 Jun 2017 01:00:00 +0800</pubDate><guid isPermaLink="false">tag:www.lightxue.com,2017-06-26:/understand-python-decorator-the-easy-way</guid><category>Python</category></item><item><title>[译]让你的Python代码优雅又地道</title><link>http://www.lightxue.com/transforming-code-into-beautiful-idiomatic-python</link><description>&lt;h2&gt;译序&lt;/h2&gt;
 &lt;blockquote&gt;
 &lt;p&gt;如果说优雅也有缺点的话，那就是你需要艰巨的工作才能得到它，需要良好的教育才能欣赏它。&lt;/p&gt;

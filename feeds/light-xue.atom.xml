@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>0xFEE1C001 - Light Xue</title><link href="http://www.lightxue.com/" rel="alternate"></link><link href="/feeds/light-xue.atom.xml" rel="self"></link><id>http://www.lightxue.com/</id><updated>2017-06-26T01:00:00+08:00</updated><entry><title>简单地理解Python的装饰器</title><link href="http://www.lightxue.com/understand-python-decorator-the-easy-way" rel="alternate"></link><published>2017-06-26T01:00:00+08:00</published><updated>2017-06-26T01:00:00+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2017-06-26:/understand-python-decorator-the-easy-way</id><summary type="html">&lt;p&gt;Python有大量强大又贴心的特性，如果要列个最受欢迎排行榜，那么装饰器绝对会在其中。&lt;/p&gt;
-&lt;p&gt;初识装饰器，会感觉到优雅且神奇，想亲手实现时却总有距离感，就像深闺的冰美人一般。这往往是因为理解装饰器时把其他的一些概念混杂在一起了。待我抚去层层面纱，你会看到纯粹的装饰器其实蛮简单直率的。&lt;/p&gt;
+&lt;p&gt;刚开始接触装饰器时，会觉得代码写起来不多，但语法难以理解。其实装饰器的语法本身挺简单的，觉得复杂是因为同时把其它的概念混在一起了。下面我们一起抛去无关的概念，简单地理解Python的装饰器。&lt;/p&gt;
 </summary><content type="html">&lt;p&gt;Python有大量强大又贴心的特性，如果要列个最受欢迎排行榜，那么装饰器绝对会在其中。&lt;/p&gt;
-&lt;p&gt;初识装饰器，会感觉到优雅且神奇，想亲手实现时却总有距离感，就像深闺的冰美人一般。这往往是因为理解装饰器时把其他的一些概念混杂在一起了。待我抚去层层面纱，你会看到纯粹的装饰器其实蛮简单直率的。&lt;/p&gt;
+&lt;p&gt;刚开始接触装饰器时，会觉得代码写起来不多，但语法难以理解。其实装饰器的语法本身挺简单的，觉得复杂是因为同时把其它的概念混在一起了。下面我们一起抛去无关的概念，简单地理解Python的装饰器。&lt;/p&gt;
 
 
 &lt;h2&gt;装饰器的原理&lt;/h2&gt;
