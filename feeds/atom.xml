@@ -360,7 +360,7 @@ After def: {&amp;#39;inner&amp;#39;: &amp;lt;function outer.&amp;lt;locals&amp;g
 
 
 &lt;p&gt;实现装饰器时往往不知道调用方会怎么用，所以养成好习惯加上&lt;code&gt;functools.wraps&lt;/code&gt;吧。&lt;/p&gt;
-&lt;p&gt;这次是真·完结了，撒花吧~~~&lt;/p&gt;</content><category term="Python"></category></entry><entry><title>[译]让你的Python代码优雅又地道</title><link href="http://www.lightxue.com/transforming-code-into-beautiful-idiomatic-python" rel="alternate"></link><published>2017-06-18T17:55:00+08:00</published><updated>2017-06-18T17:55:00+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2017-06-18:/transforming-code-into-beautiful-idiomatic-python</id><summary type="html">&lt;h2&gt;译序&lt;/h2&gt;
+&lt;p&gt;这次是真·完结了，有疑问请留言，撒花吧~~~&lt;/p&gt;</content><category term="Python"></category></entry><entry><title>[译]让你的Python代码优雅又地道</title><link href="http://www.lightxue.com/transforming-code-into-beautiful-idiomatic-python" rel="alternate"></link><published>2017-06-18T17:55:00+08:00</published><updated>2017-06-18T17:55:00+08:00</updated><author><name>Light Xue</name></author><id>tag:www.lightxue.com,2017-06-18:/transforming-code-into-beautiful-idiomatic-python</id><summary type="html">&lt;h2&gt;译序&lt;/h2&gt;
 &lt;blockquote&gt;
 &lt;p&gt;如果说优雅也有缺点的话，那就是你需要艰巨的工作才能得到它，需要良好的教育才能欣赏它。&lt;/p&gt;
 &lt;p&gt;—— Edsger Wybe Dijkstra&lt;/p&gt;
