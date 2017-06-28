@@ -1,0 +1,16 @@
+{% if GITMENT_ID and GITMENT_SECRET %}
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: location.pathname,
+  owner: '{{ GITHUB_ID }}',
+  repo: '{{ GITMENT_REPO }}',
+  oauth: {
+    client_id: '{{ GITMENT_ID }}',
+    client_secret: '{{ GITMENT_SECRET }}',
+  },
+})
+gitment.render('gitment-container')
+</script>
+{% endif %}

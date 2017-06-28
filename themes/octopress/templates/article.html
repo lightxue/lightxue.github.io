@@ -21,6 +21,11 @@
     <div id="disqus_thread" aria-live="polite">{% include '_includes/disqus_thread.html' %}</div>
     {% endif %}
   </section>
+  {% elif GITMENT_ID and GITMENT_SECRET and SITEURL and article.status != "draft" %}
+  <section>
+    <h1>评论</h1>
+    <div id="gitment-container" aria-live="polite">{% include '_includes/gitment_thread.html' %}</div>
+  </section>
   {% endif %}
 </div>
 {% endblock %}

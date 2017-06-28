@@ -79,7 +79,7 @@ DEFAULT_PAGINATION = 10
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
-DISQUS_SITENAME = '0xfee1c00l'
+#DISQUS_SITENAME = '0xfee1c00l'
 
 PLUGIN_PATHS = ['plugins']
 PLUGINS = [
@@ -102,3 +102,8 @@ MARKDOWN = {
 
 BAIDU_ANALYTICS = '8a9edae11717cd734925510200712026'
 GOOGLE_ANALYTICS = 'UA-42436465-3'
+
+GITHUB_ID = 'lightxue'
+GITMENT_REPO = 'lightxue.github.io'
+GITMENT_ID = 'cfbdea1160f74d535db2'
+GITMENT_SECRET = '5616e795360075c1d526671e6b272f3da57ac501'
