@@ -108,15 +108,15 @@
   <!--<section>-->
   <!--<h1>Tags</h1>-->
   <!---->
-    <!--<a href="/tag/algorithm">algorithm</a>,-->
-  <!---->
     <!--<a href="/tag/python">Python</a>,-->
-  <!---->
-    <!--<a href="/tag/shell">shell</a>,-->
   <!---->
     <!--<a href="/tag/linux">Linux</a>,-->
   <!---->
-    <!--<a href="/tag/c">C</a>-->
+    <!--<a href="/tag/shell">shell</a>,-->
+  <!---->
+    <!--<a href="/tag/c">C</a>,-->
+  <!---->
+    <!--<a href="/tag/algorithm">algorithm</a>-->
   <!---->
   <!--</section>-->
 
@@ -157,13 +157,20 @@
       s.parentNode.insertBefore(hm, s);
     })();
     </script>
-  <script type="text/javascript">
-    var disqus_shortname = '0xfee1c00l';
-    (function() {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-     })();
-  </script>
+<div id="gitment-container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: location.pathname,
+  owner: 'lightxue',
+  repo: 'lightxue.github.io',
+  oauth: {
+    client_id: 'cfbdea1160f74d535db2',
+    client_secret: '5616e795360075c1d526671e6b272f3da57ac501',
+  },
+})
+gitment.render('gitment-container')
+</script>
 </body>
 </html>
