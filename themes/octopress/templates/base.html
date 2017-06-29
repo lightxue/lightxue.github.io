@@ -10,6 +10,11 @@
   <meta charset="utf-8">
   <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
   <meta name="author" content="{{ AUTHOR }}">
+
+  {% if article and article.keywords %}
+  <meta name="keywords" content="{{ article.keywords }}" />
+  {% endif %}
+
   {% if article and article.description %}
   <meta name="description" content="{{ article.description }}" />
   {% endif %}
