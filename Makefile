@@ -44,7 +44,7 @@ help:
 	@echo '                                                                          '
 
 init:
-	sudo $(PIP) install pelican markdown ghp-import
+	sudo $(PIP) install pelican markdown ghp-import beautifulsoup4
 
 html:
 	$(PELICAN) $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
