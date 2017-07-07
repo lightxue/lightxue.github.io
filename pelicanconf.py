@@ -84,6 +84,7 @@ DEFAULT_PAGINATION = 10
 PLUGIN_PATHS = ['plugins']
 PLUGINS = [
     'summary',
+    'render_math',
 ]
 
 SUMMARY_END_MARKER = '<!-- more -->'
@@ -98,6 +99,10 @@ MARKDOWN = {
         'markdown.extensions.meta': {},
     },
     'output_format': 'html5',
+}
+
+MATH_JAX = {
+    'source': '"//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"'
 }
 
 BAIDU_ANALYTICS = '8a9edae11717cd734925510200712026'
