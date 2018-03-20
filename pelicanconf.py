@@ -33,7 +33,7 @@ SEARCH_SITE = 'lightxue.com'
 MENUITEMS = (
     ('首页', '/'),
     ('程序员工具', 'http://tools.lightxue.com'),
-    #('关于', '/about-me'),
+    ('关于', '/about-me'),
 )
 DISPLAY_PAGES_ON_MENU = False
 DISPLAY_CATEGORIES_ON_MENU = False
