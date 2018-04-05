@@ -85,6 +85,7 @@ PLUGIN_PATHS = ['plugins']
 PLUGINS = [
     'summary',
     'render_math',
+    'better_codeblock_line_numbering',
 ]
 
 SUMMARY_END_MARKER = '<!-- more -->'
@@ -93,7 +94,7 @@ MARKDOWN = {
     'extension_configs': {
         'markdown.extensions.codehilite': {
             'css_class': 'highlight',
-            'linenums': True,
+            'linenums': False,
         },
         'markdown.extensions.extra': {},
         'markdown.extensions.meta': {},

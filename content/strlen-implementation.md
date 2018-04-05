@@ -13,24 +13,24 @@ description: 解析一段牛逼的strlen实现
 <!-- more -->
 
 ```c
-    size_t strlen(const char* str)
-    {
-        size_t len = 0;
-        while (*str++)
-            len++;
-        return len;
-    }
+size_t strlen(const char* str)
+{
+    size_t len = 0;
+    while (*str++)
+        len++;
+    return len;
+}
 ```
 
 这大概是通常的写法，或者是像C语言程序设计的示例
 ```c
-    int strlen(char* s)
-    {
-        char *p = s;
-        while(*p++)
-            ;
-        return p - s;
-    }
+int strlen(char* s)
+{
+    char *p = s;
+    while(*p++)
+        ;
+    return p - s;
+}
 ```
 
 和某B偶然说到这个函数，那B说面试的时候老大问了strlen的写法，他当时用了一种
@@ -38,62 +38,62 @@ description: 解析一段牛逼的strlen实现
 
 答曰不是，然后上网去搜了一个glibc的strlen实现。大概如下：
 ```c
-    size_t strlen (const char *str)
+size_t strlen (const char *str)
+{
+    const char *char_ptr;
+    const unsigned long int *longword_ptr;
+    unsigned long int longword, magic_bits, himagic, lomagic;
+
+    for (char_ptr = str; ((unsigned long int) char_ptr
+            & (sizeof (longword) - 1)) != 0;
+                ++char_ptr)
+        if (*char_ptr == '\0')
+            return char_ptr - str;
+
+    longword_ptr = (unsigned long int *) char_ptr;
+
+    magic_bits = 0x7efefeffL;
+    himagic = 0x80808080L;
+    lomagic = 0x01010101L;
+    if (sizeof (longword) > 4)
     {
-        const char *char_ptr;
-        const unsigned long int *longword_ptr;
-        unsigned long int longword, magic_bits, himagic, lomagic;
+        magic_bits = ((0x7efefefeL << 16) << 16) | 0xfefefeffL;
+        himagic = ((himagic << 16) << 16) | himagic;
+        lomagic = ((lomagic << 16) << 16) | lomagic;
+    }
+    if (sizeof (longword) > 8)
+        abort ();
 
-        for (char_ptr = str; ((unsigned long int) char_ptr
-                & (sizeof (longword) - 1)) != 0;
-                    ++char_ptr)
-            if (*char_ptr == '\0')
-                return char_ptr - str;
+    for (;;)
+    {
+        longword = *longword_ptr++;
 
-        longword_ptr = (unsigned long int *) char_ptr;
-
-        magic_bits = 0x7efefeffL;
-        himagic = 0x80808080L;
-        lomagic = 0x01010101L;
-        if (sizeof (longword) > 4)
+        if (((longword - lomagic) & himagic) != 0)
         {
-            magic_bits = ((0x7efefefeL << 16) << 16) | 0xfefefeffL;
-            himagic = ((himagic << 16) << 16) | himagic;
-            lomagic = ((lomagic << 16) << 16) | lomagic;
-        }
-        if (sizeof (longword) > 8)
-            abort ();
+            const char *cp = (const char *) (longword_ptr - 1);
 
-        for (;;)
-        {
-            longword = *longword_ptr++;
-
-            if (((longword - lomagic) & himagic) != 0)
+            if (cp[0] == 0)
+                return cp - str;
+            if (cp[1] == 0)
+                return cp - str + 1;
+            if (cp[2] == 0)
+                return cp - str + 2;
+            if (cp[3] == 0)
+                return cp - str + 3;
+            if (sizeof (longword) > 4)
             {
-                const char *cp = (const char *) (longword_ptr - 1);
-
-                if (cp[0] == 0)
-                    return cp - str;
-                if (cp[1] == 0)
-                    return cp - str + 1;
-                if (cp[2] == 0)
-                    return cp - str + 2;
-                if (cp[3] == 0)
-                    return cp - str + 3;
-                if (sizeof (longword) > 4)
-                {
-                    if (cp[4] == 0)
-                        return cp - str + 4;
-                    if (cp[5] == 0)
-                        return cp - str + 5;
-                    if (cp[6] == 0)
-                        return cp - str + 6;
-                    if (cp[7] == 0)
-                        return cp - str + 7;
-                }
+                if (cp[4] == 0)
+                    return cp - str + 4;
+                if (cp[5] == 0)
+                    return cp - str + 5;
+                if (cp[6] == 0)
+                    return cp - str + 6;
+                if (cp[7] == 0)
+                    return cp - str + 7;
             }
         }
     }
+}
 ```
 
 艹，这么长(你这么想了，你一定这么想了)。
