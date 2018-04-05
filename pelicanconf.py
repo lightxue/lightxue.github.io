@@ -93,7 +93,7 @@ MARKDOWN = {
     'extension_configs': {
         'markdown.extensions.codehilite': {
             'css_class': 'highlight',
-            'linenums': False
+            'linenums': True,
         },
         'markdown.extensions.extra': {},
         'markdown.extensions.meta': {},
