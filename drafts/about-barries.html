@@ -66,9 +66,9 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
 <!-- more -->
 
 <h2>一. compiler barrier</h2>
-<div class="highlight"><pre><span></span><span class="cp">#define barrier()   __asm__ __volatile__(&quot;&quot;:::&quot;memory&quot;)</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#define barrier()   __asm__ __volatile__(&quot;&quot;:::&quot;memory&quot;)</span>
 </pre></div>
-
+</td></tr></table>
 
 <p>看开源项目代码可能偶尔会看上面这样的内嵌汇编:</p>
 <ol>
@@ -80,7 +80,15 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
 <li>这条语句实际上不生成任何代码，但是会让gcc在barrier()之后刷新寄存器对变量的分配</li>
 </ol>
 <p>举个例子，考虑下面这段代码:</p>
-<div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
 <span class="p">{</span>
     <span class="k">struct</span> <span class="n">task_struct</span> <span class="o">*</span><span class="n">owner</span><span class="p">;</span>
 
@@ -90,22 +98,36 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
     <span class="cm">/* ... */</span>
 <span class="p">}</span>
 </pre></div>
-
+</td></tr></table>
 
 <p>这段代码含义大概是自旋的去获取一个mutex, 乍看一下没有问题。但是optimize编译下，compiler发现
 循环里面完全没有去修改<code>lock-&gt;owner</code>嘛，没必要每次都取值。然后这段代码可能会优化为这样:</p>
-<div class="highlight"><pre><span></span><span class="n">owner</span> <span class="o">=</span> <span class="n">lock</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">;</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">owner</span> <span class="o">=</span> <span class="n">lock</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">;</span>
 <span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">owner</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">mutex_spin_on_owner</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">owner</span><span class="p">))</span>
         <span class="k">break</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
-
+</td></tr></table>
 
 <p>这肯定不是你想要的结果，而且极有可能出现死循环。</p>
 <p>多线程情况下，编译器优化有可能会忽略<code>lock-&gt;owner</code>会被其他线程修改的情况。compiler barrier可以告诉编译器这里禁止优化，每次都从内存里面取<code>lock-&gt;owner</code>的值。修改后：</p>
-<div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span> <span class="p">;;</span> <span class="p">)</span>
 <span class="p">{</span>
     <span class="k">struct</span> <span class="n">task_struct</span> <span class="o">*</span><span class="n">owner</span><span class="p">;</span>
     <span class="n">barrier</span><span class="p">();</span>
@@ -116,29 +138,35 @@ compiler barrier，阻止运行时期重排的叫做memory barrier。</p>
     <span class="cm">/* ... */</span>
 <span class="p">}</span>
 </pre></div>
-
+</td></tr></table>
 
 <p>注：这里不用compiler barrier，<code>onwer = (volatile struct task_struct *)(lock-&gt;owner)</code>;
 直接强转为volatile指针也可以解决问题。</p>
 <h2>二. memory barrier</h2>
-<div class="highlight"><pre><span></span><span class="cp">#define mb()        __asm__ __volatile__(&quot;lock; addl $0, 0(%%rsp)&quot;:::&quot;memory&quot;)</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#define mb()        __asm__ __volatile__(&quot;lock; addl $0, 0(%%rsp)&quot;:::&quot;memory&quot;)</span>
 <span class="cp">#define rmb()       mb()</span>
 <span class="cp">#define wmb()       __asm__ __volatile__(&quot;&quot;:::&quot;memory&quot;)</span>
 </pre></div>
-
+</td></tr></table>
 
 <p>上面三个分别是读写内存屏障，读内存屏障和写内存屏障，在常见的x86/x64体系下，通常使用<code>lock</code>指令前缀
 加上一个空操作来实现memory barrier, 注意当然不能是真的nop指令，linux中采用<code>addl $0, 0(%esp)</code>。</p>
 <p>memory barrier可以保证运行时期的内存访问次序不被重排，保证程序的执行看上去满足顺序一致性。<code>volatile</code>关键字无法做到这一点，所以<code>volatile</code>不能保证是一个memory barrier。</p>
 <p>另外也不能指望独立的memory barrier能不做很多事情，mb往往是成对出现的。</p>
 <p>考虑下面这种情况，机器有两个核心，x和y都被初始化为0：</p>
-<div class="highlight"><pre><span></span><span class="n">CPU</span> <span class="mi">0</span>                   <span class="n">CPU</span> <span class="mi">1</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">CPU</span> <span class="mi">0</span>                   <span class="n">CPU</span> <span class="mi">1</span>
 
 <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>                  <span class="n">r1</span> <span class="o">=</span> <span class="n">y</span><span class="p">;</span>
 <span class="n">mb</span><span class="p">();</span>                   <span class="n">mb</span><span class="p">();</span>
 <span class="n">y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>                  <span class="n">r2</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
 </pre></div>
-
+</td></tr></table>
 
 <p>CPU 0和CPU 1走完所有语句之后，总共有下面三种可能:</p>
 <ol>
