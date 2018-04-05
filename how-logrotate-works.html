@@ -65,19 +65,14 @@
 
 <h2>运行机制</h2>
 <p>logrotate在很多Linux发行版上都是默认安装的。系统会定时运行logrotate，一般是每天一次。系统是这么实现按天执行的。crontab会每天定时执行<code>/etc/cron.daily</code>目录下的脚本，而这个目录下有个文件叫<code>logrotate</code>。在centos上脚本内容是这样的：</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6</pre></div></td><td class="code"><div class="highlight"><pre><span></span>/usr/sbin/logrotate /etc/logrotate.conf &gt;/dev/null <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
-<span class="nv">EXITVALUE</span><span class="o">=</span><span class="nv">$?</span>
-<span class="k">if</span> <span class="o">[</span> <span class="nv">$EXITVALUE</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-    /usr/bin/logger -t logrotate <span class="s2">&quot;ALERT exited abnormally with [</span><span class="nv">$EXITVALUE</span><span class="s2">]&quot;</span>
-<span class="k">fi</span>
-<span class="nb">exit</span> <span class="m">0</span>
+<div class="highlight"><pre><span class="code-line"><span></span>/usr/sbin/logrotate /etc/logrotate.conf &gt;/dev/null <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span></span>
+<span class="code-line"><span class="nv">EXITVALUE</span><span class="o">=</span><span class="nv">$?</span></span>
+<span class="code-line"><span class="k">if</span> <span class="o">[</span> <span class="nv">$EXITVALUE</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span></span>
+<span class="code-line">    /usr/bin/logger -t logrotate <span class="s2">&quot;ALERT exited abnormally with [</span><span class="nv">$EXITVALUE</span><span class="s2">]&quot;</span></span>
+<span class="code-line"><span class="k">fi</span></span>
+<span class="code-line"><span class="nb">exit</span> <span class="m">0</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>可以看到这个脚本主要做的事就是以<code>/etc/logrotate.conf</code>为配置文件执行了logrotate。就是这样实现了每天执行一次logrotate。</p>
 <p>因为我的系统执行<code>/etc/cron.daily</code>目录下的脚本不是我想滚动日志的时间，所以我把<code>/etc/cron.daily/logrotate</code>拷了出来，改了一下logrotate配置文件的路径，然后在crontab里加上一条指定时间执行这个脚本的记录，自定义周期滚动日志就大功告成了。这种自定义的方式有两点要注意：</p>
@@ -90,9 +85,9 @@
 </li>
 </ol>
 <p>很多程序的会用到logrotate滚动日志，比如nginx。它们安装后，会在<code>/etc/logrotate.d</code>这个目录下增加自己的logrotate的配置文件。logrotate什么时候执行<code>/etc/logrotate.d</code>下的配置呢？看到<code>/etc/logrotate.conf</code>里这行，一切就不言而喻了。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>include /etc/logrotate.d
+<div class="highlight"><pre><span class="code-line"><span></span>include /etc/logrotate.d</span>
 </pre></div>
-</td></tr></table>
+
 
 <h2>原理</h2>
 <p>logrotate是怎么做到滚动日志时不影响程序正常的日志输出呢？logrotate提供了两种解决方案。</p>

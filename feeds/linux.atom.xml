@@ -7,19 +7,14 @@
 
 &lt;h2&gt;运行机制&lt;/h2&gt;
 &lt;p&gt;logrotate在很多Linux发行版上都是默认安装的。系统会定时运行logrotate，一般是每天一次。系统是这么实现按天执行的。crontab会每天定时执行&lt;code&gt;/etc/cron.daily&lt;/code&gt;目录下的脚本，而这个目录下有个文件叫&lt;code&gt;logrotate&lt;/code&gt;。在centos上脚本内容是这样的：&lt;/p&gt;
-&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
-2
-3
-4
-5
-6&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;/usr/sbin/logrotate /etc/logrotate.conf &amp;gt;/dev/null &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
-&lt;span class="nv"&gt;EXITVALUE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$EXITVALUE&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
-    /usr/bin/logger -t logrotate &lt;span class="s2"&gt;&amp;quot;ALERT exited abnormally with [&lt;/span&gt;&lt;span class="nv"&gt;$EXITVALUE&lt;/span&gt;&lt;span class="s2"&gt;]&amp;quot;&lt;/span&gt;
-&lt;span class="k"&gt;fi&lt;/span&gt;
-&lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;/usr/sbin/logrotate /etc/logrotate.conf &amp;gt;/dev/null &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nv"&gt;EXITVALUE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$EXITVALUE&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    /usr/bin/logger -t logrotate &lt;span class="s2"&gt;&amp;quot;ALERT exited abnormally with [&lt;/span&gt;&lt;span class="nv"&gt;$EXITVALUE&lt;/span&gt;&lt;span class="s2"&gt;]&amp;quot;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;fi&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
 
 &lt;p&gt;可以看到这个脚本主要做的事就是以&lt;code&gt;/etc/logrotate.conf&lt;/code&gt;为配置文件执行了logrotate。就是这样实现了每天执行一次logrotate。&lt;/p&gt;
 &lt;p&gt;因为我的系统执行&lt;code&gt;/etc/cron.daily&lt;/code&gt;目录下的脚本不是我想滚动日志的时间，所以我把&lt;code&gt;/etc/cron.daily/logrotate&lt;/code&gt;拷了出来，改了一下logrotate配置文件的路径，然后在crontab里加上一条指定时间执行这个脚本的记录，自定义周期滚动日志就大功告成了。这种自定义的方式有两点要注意：&lt;/p&gt;
@@ -32,9 +27,9 @@
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;很多程序的会用到logrotate滚动日志，比如nginx。它们安装后，会在&lt;code&gt;/etc/logrotate.d&lt;/code&gt;这个目录下增加自己的logrotate的配置文件。logrotate什么时候执行&lt;code&gt;/etc/logrotate.d&lt;/code&gt;下的配置呢？看到&lt;code&gt;/etc/logrotate.conf&lt;/code&gt;里这行，一切就不言而喻了。&lt;/p&gt;
-&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;include /etc/logrotate.d
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;include /etc/logrotate.d&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
 
 &lt;h2&gt;原理&lt;/h2&gt;
 &lt;p&gt;logrotate是怎么做到滚动日志时不影响程序正常的日志输出呢？logrotate提供了两种解决方案。&lt;/p&gt;

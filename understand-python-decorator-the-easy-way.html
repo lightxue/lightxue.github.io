@@ -66,279 +66,191 @@
 
 <h2>装饰器的原理</h2>
 <p>在解释器下跑个装饰器的例子，直观地感受一下。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># make_bold就是装饰器，实现方式这里略去</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_bold</span>
-<span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-<span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-<span class="o">...</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span>
-<span class="s1">&#39;&lt;b&gt;hello world&lt;/b&gt;&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># make_bold就是装饰器，实现方式这里略去</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_bold</span></span>
+<span class="code-line"><span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"><span class="o">...</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span></span>
+<span class="code-line"><span class="s1">&#39;&lt;b&gt;hello world&lt;/b&gt;&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>被<code>make_bold</code>装饰的<code>get_content</code>，调用后返回结果会自动被<code>b</code>标签包住。怎么做到的呢，简单4步就能明白了。</p>
 <h3>1. 函数是对象</h3>
 <p>我们定义个<code>get_content</code>函数。这时<code>get_content</code>也是个对象，它能做所有对象的操作。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>它有<code>id</code>，有<code>type</code>，有值。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6</pre></div></td><td class="code"><div class="highlight"><pre><span></span>&gt;&gt;&gt; id(get_content)
-140090200473112
-&gt;&gt;&gt; type(get_content)
-&lt;class &#39;function&#39;&gt;
-&gt;&gt;&gt; get_content
-&lt;function get_content at 0x7f694aa2be18&gt;
+<div class="highlight"><pre><span class="code-line"><span></span>&gt;&gt;&gt; id(get_content)</span>
+<span class="code-line">140090200473112</span>
+<span class="code-line">&gt;&gt;&gt; type(get_content)</span>
+<span class="code-line">&lt;class &#39;function&#39;&gt;</span>
+<span class="code-line">&gt;&gt;&gt; get_content</span>
+<span class="code-line">&lt;function get_content at 0x7f694aa2be18&gt;</span>
 </pre></div>
-</td></tr></table>
+
 
 <p>跟其他对象一样可以被赋值给其它变量。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">func_name</span> <span class="o">=</span> <span class="n">get_content</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">func_name</span><span class="p">()</span>
-<span class="s1">&#39;hello world&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">func_name</span> <span class="o">=</span> <span class="n">get_content</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">func_name</span><span class="p">()</span></span>
+<span class="code-line"><span class="s1">&#39;hello world&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>它可以当参数传递，也可以当返回值</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
-<span class="o">...</span>     <span class="k">print</span><span class="p">(</span><span class="n">bar</span><span class="p">())</span>
-<span class="o">...</span>     <span class="k">return</span> <span class="n">bar</span>
-<span class="o">...</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">func</span> <span class="o">=</span> <span class="n">foo</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span>
-<span class="n">hello</span> <span class="n">world</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">func</span><span class="p">()</span>
-<span class="s1">&#39;hello world&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="k">print</span><span class="p">(</span><span class="n">bar</span><span class="p">())</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="k">return</span> <span class="n">bar</span></span>
+<span class="code-line"><span class="o">...</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">func</span> <span class="o">=</span> <span class="n">foo</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span></span>
+<span class="code-line"><span class="n">hello</span> <span class="n">world</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">func</span><span class="p">()</span></span>
+<span class="code-line"><span class="s1">&#39;hello world&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <h3>2. 自定义函数对象</h3>
 <p>我们可以用<code>class</code>来构造函数对象。有成员函数<code>__call__</code>的就是函数对象了，函数对象被调用时正是调用的<code>__call__</code>。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FuncObj</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Initialize&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span> <span class="n">name</span>
-
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hi&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">class</span> <span class="nc">FuncObj</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Initialize&#39;</span><span class="p">)</span></span>
+<span class="code-line">        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span> <span class="n">name</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hi&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>我们来调用看看。可以看到，<strong>函数对象的使用分两步：构造和调用</strong>(同学们注意了，这是考点)。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">fo</span> <span class="o">=</span> <span class="n">FuncObj</span><span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
-<span class="n">Initialize</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">fo</span><span class="p">()</span>
-<span class="n">Hi</span> <span class="n">python</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">fo</span> <span class="o">=</span> <span class="n">FuncObj</span><span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">)</span></span>
+<span class="code-line"><span class="n">Initialize</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">fo</span><span class="p">()</span></span>
+<span class="code-line"><span class="n">Hi</span> <span class="n">python</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <h3>3. <code>@</code>是个语法糖</h3>
 <p>装饰器的<code>@</code>没有做什么特别的事，不用它也可以实现一样的功能，只不过需要更多的代码。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nd">@make_bold</span>
-<span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-
-<span class="c1"># 上面的代码等价于下面的</span>
-
-<span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-<span class="n">get_content</span> <span class="o">=</span> <span class="n">make_bold</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="nd">@make_bold</span></span>
+<span class="code-line"><span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="c1"># 上面的代码等价于下面的</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"><span class="n">get_content</span> <span class="o">=</span> <span class="n">make_bold</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p><code>make_bold</code>是个函数，要求入参是函数对象，返回值是函数对象。<code>@</code>的语法糖其实是省去了上面最后一行代码，使可读性更好。用了装饰器后，每次调用<code>get_content</code>，真正调用的是<code>make_bold</code>返回的函数对象。</p>
 <h3>4. 用类实现装饰器</h3>
 <p>入参是函数对象，返回是函数对象，如果第2步里的类的构造函数改成入参是个函数对象，不就正好符合要求吗？我们来试试实现<code>make_bold</code>。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">make_bold</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Initialize&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
-
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Call&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">())</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">class</span> <span class="nc">make_bold</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Initialize&#39;</span><span class="p">)</span></span>
+<span class="code-line">        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Call&#39;</span><span class="p">)</span></span>
+<span class="code-line">        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">())</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>大功告成，看看能不能用。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_bold</span>
-<span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-<span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-<span class="o">...</span>
-<span class="n">Initialize</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span>
-<span class="n">Call</span>
-<span class="s1">&#39;&lt;b&gt;hello world&lt;/b&gt;&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_bold</span></span>
+<span class="code-line"><span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"><span class="o">...</span></span>
+<span class="code-line"><span class="n">Initialize</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span></span>
+<span class="code-line"><span class="n">Call</span></span>
+<span class="code-line"><span class="s1">&#39;&lt;b&gt;hello world&lt;/b&gt;&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>成功实现装饰器！是不是很简单？</p>
 <p>这里分析一下之前强调的<strong>构造</strong>和<strong>调用</strong>两个过程。我们去掉<code>@</code>语法糖好理解一些。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># 构造，使用装饰器时构造函数对象，调用了__init__</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span> <span class="o">=</span> <span class="n">make_bold</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span>
-<span class="n">Initialize</span>
-
-<span class="c1"># 调用，实际上直接调用的是make_bold构造出来的函数对象</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span>
-<span class="n">Call</span>
-<span class="s1">&#39;&lt;b&gt;hello world&lt;/b&gt;&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># 构造，使用装饰器时构造函数对象，调用了__init__</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span> <span class="o">=</span> <span class="n">make_bold</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span></span>
+<span class="code-line"><span class="n">Initialize</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="c1"># 调用，实际上直接调用的是make_bold构造出来的函数对象</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span></span>
+<span class="code-line"><span class="n">Call</span></span>
+<span class="code-line"><span class="s1">&#39;&lt;b&gt;hello world&lt;/b&gt;&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>到这里就彻底清楚了，完结撒花，可以关掉网页了~~~(如果只是想知道装饰器原理的话)</p>
 <h2>函数版装饰器</h2>
 <p>阅读源码时，经常见到用嵌套函数实现的装饰器，怎么理解？同样仅需4步。</p>
 <h3>1. <code>def</code>的函数对象初始化</h3>
 <p>用<code>class</code>实现的函数对象很容易看到什么时候<strong>构造</strong>的，那<code>def</code>定义的函数对象什么时候<strong>构造</strong>的呢？</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># 这里的全局变量删去了无关的内容</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">globals</span><span class="p">()</span>
-<span class="p">{}</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">func</span><span class="p">():</span>
-<span class="o">...</span>     <span class="k">pass</span>
-<span class="o">...</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">globals</span><span class="p">()</span>
-<span class="p">{</span><span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">func</span> <span class="n">at</span> <span class="mh">0x10f5baf28</span><span class="o">&gt;</span><span class="p">}</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># 这里的全局变量删去了无关的内容</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="nb">globals</span><span class="p">()</span></span>
+<span class="code-line"><span class="p">{}</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">func</span><span class="p">():</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="k">pass</span></span>
+<span class="code-line"><span class="o">...</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="nb">globals</span><span class="p">()</span></span>
+<span class="code-line"><span class="p">{</span><span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">func</span> <span class="n">at</span> <span class="mh">0x10f5baf28</span><span class="o">&gt;</span><span class="p">}</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>不像一些编译型语言，程序在启动时函数已经构造那好了。上面的例子可以看到，执行到<code>def</code>会才构造出一个函数对象，并赋值给变量<code>make_bold</code>。</p>
 <p>这段代码和下面的代码效果是很像的。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">NoName</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-<span class="n">func</span> <span class="o">=</span> <span class="n">NoName</span><span class="p">()</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">class</span> <span class="nc">NoName</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">pass</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="n">func</span> <span class="o">=</span> <span class="n">NoName</span><span class="p">()</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <h3>2. 嵌套函数</h3>
 <p>Python的函数可以嵌套定义。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">outer</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Before def:&#39;</span><span class="p">,</span> <span class="nb">locals</span><span class="p">())</span>
-    <span class="k">def</span> <span class="nf">inner</span><span class="p">():</span>
-        <span class="k">pass</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;After def:&#39;</span><span class="p">,</span> <span class="nb">locals</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">inner</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">def</span> <span class="nf">outer</span><span class="p">():</span></span>
+<span class="code-line">    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Before def:&#39;</span><span class="p">,</span> <span class="nb">locals</span><span class="p">())</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="nf">inner</span><span class="p">():</span></span>
+<span class="code-line">        <span class="k">pass</span></span>
+<span class="code-line">    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;After def:&#39;</span><span class="p">,</span> <span class="nb">locals</span><span class="p">())</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="n">inner</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p><code>inner</code>是在<code>outer</code>内定义的，所以算<code>outer</code>的局部变量。执行到<code>def inner</code>时函数对象才创建，因此每次调用<code>outer</code>都会创建一个新的<code>inner</code>。下面可以看出，每次返回的<code>inner</code>是不同的。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8</pre></div></td><td class="code"><div class="highlight"><pre><span></span>&gt;&gt;&gt; outer()
-Before def: {}
-After def: {&#39;inner&#39;: &lt;function outer.&lt;locals&gt;.inner at 0x7f0b18fa0048&gt;}
-&lt;function outer.&lt;locals&gt;.inner at 0x7f0b18fa0048&gt;
-&gt;&gt;&gt; outer()
-Before def: {}
-After def: {&#39;inner&#39;: &lt;function outer.&lt;locals&gt;.inner at 0x7f0b18fa00d0&gt;}
-&lt;function outer.&lt;locals&gt;.inner at 0x7f0b18fa00d0&gt;
+<div class="highlight"><pre><span class="code-line"><span></span>&gt;&gt;&gt; outer()</span>
+<span class="code-line">Before def: {}</span>
+<span class="code-line">After def: {&#39;inner&#39;: &lt;function outer.&lt;locals&gt;.inner at 0x7f0b18fa0048&gt;}</span>
+<span class="code-line">&lt;function outer.&lt;locals&gt;.inner at 0x7f0b18fa0048&gt;</span>
+<span class="code-line">&gt;&gt;&gt; outer()</span>
+<span class="code-line">Before def: {}</span>
+<span class="code-line">After def: {&#39;inner&#39;: &lt;function outer.&lt;locals&gt;.inner at 0x7f0b18fa00d0&gt;}</span>
+<span class="code-line">&lt;function outer.&lt;locals&gt;.inner at 0x7f0b18fa00d0&gt;</span>
 </pre></div>
-</td></tr></table>
+
 
 <h3>3. 闭包</h3>
 <p>嵌套函数有什么特别之处？因为有闭包。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">outer</span><span class="p">():</span>
-    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;hello world&#39;</span>
-    <span class="k">def</span> <span class="nf">inner</span><span class="p">():</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">inner</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">def</span> <span class="nf">outer</span><span class="p">():</span></span>
+<span class="code-line">    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="nf">inner</span><span class="p">():</span></span>
+<span class="code-line">        <span class="k">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="n">inner</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>下面的试验表明，<code>inner</code>可以访问到<code>outer</code>的局部变量<code>msg</code>。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">func</span> <span class="o">=</span> <span class="n">outer</span><span class="p">()</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">func</span><span class="p">()</span>
-<span class="n">hello</span> <span class="n">world</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">func</span> <span class="o">=</span> <span class="n">outer</span><span class="p">()</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">func</span><span class="p">()</span></span>
+<span class="code-line"><span class="n">hello</span> <span class="n">world</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>闭包有2个特点</p>
 <ol>
@@ -348,247 +260,163 @@ After def: {&#39;inner&#39;: &lt;function outer.&lt;locals&gt;.inner at 0x7f0b18
 <p>这部分想深入可以去了解Python的LEGB规则。</p>
 <h3>4. 用函数实现装饰器</h3>
 <p>装饰器要求入参是函数对象，返回值是函数对象，嵌套函数完全能胜任。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_bold</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Initialize&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">():</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Call&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">wrapper</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">def</span> <span class="nf">make_bold</span><span class="p">(</span><span class="n">func</span><span class="p">):</span></span>
+<span class="code-line">    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Initialize&#39;</span><span class="p">)</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">():</span></span>
+<span class="code-line">        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Call&#39;</span><span class="p">)</span></span>
+<span class="code-line">        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="p">())</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="n">wrapper</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>用法跟类实现的装饰器一样。可以去掉<code>@</code>语法糖分析下<strong>构造</strong>和<strong>调用</strong>的时机。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_bold</span>
-<span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-<span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-<span class="o">...</span>
-<span class="n">Initialize</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span>
-<span class="n">Call</span>
-<span class="s1">&#39;&lt;b&gt;hello world&lt;/b&gt;&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_bold</span></span>
+<span class="code-line"><span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"><span class="o">...</span></span>
+<span class="code-line"><span class="n">Initialize</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span></span>
+<span class="code-line"><span class="n">Call</span></span>
+<span class="code-line"><span class="s1">&#39;&lt;b&gt;hello world&lt;/b&gt;&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>因为返回的<code>wrapper</code>还在引用着，所以存在于<code>make_bold</code>命名空间的<code>func</code>不会消失。<code>make_bold</code>可以装饰多个函数，<code>wrapper</code>不会调用混淆，因为每次调用<code>make_bold</code>，都会有创建新的命名空间和新的<code>wrapper</code>。</p>
 <p>到此函数实现装饰器也理清楚了，完结撒花，可以关掉网页了~~~(后面是使用装饰的常见问题)</p>
 <h2>常见问题</h2>
 <h3>1. 怎么实现带参数的装饰器？</h3>
 <p>带参数的装饰器，有时会异常的好用。我们看个例子。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_header</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-<span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-<span class="o">...</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span>
-<span class="s1">&#39;&lt;h2&gt;hello world&lt;/h2&gt;&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_header</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></span>
+<span class="code-line"><span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"><span class="o">...</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span></span>
+<span class="code-line"><span class="s1">&#39;&lt;h2&gt;hello world&lt;/h2&gt;&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>怎么做到的呢？其实这跟装饰器语法没什么关系。去掉<code>@</code>语法糖会变得很容易理解。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nd">@make_header</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-
-<span class="c1"># 等价于</span>
-
-<span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-<span class="n">unnamed_decorator</span> <span class="o">=</span> <span class="n">make_header</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">get_content</span> <span class="o">=</span> <span class="n">unnamed_decorator</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="nd">@make_header</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></span>
+<span class="code-line"><span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="c1"># 等价于</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"><span class="n">unnamed_decorator</span> <span class="o">=</span> <span class="n">make_header</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></span>
+<span class="code-line"><span class="n">get_content</span> <span class="o">=</span> <span class="n">unnamed_decorator</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>上面代码中的<code>unnamed_decorator</code>才是真正的装饰器，<code>make_header</code>是个普通的函数，它的返回值是装饰器。</p>
 <p>来看一下实现的代码。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_header</span><span class="p">(</span><span class="n">level</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Create decorator&#39;</span><span class="p">)</span>
-
-    <span class="c1"># 这部分跟通常的装饰器一样，只是wrapper通过闭包访问了变量level</span>
-    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Initialize&#39;</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">():</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Call&#39;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="s1">&#39;&lt;h{0}&gt;{1}&lt;/h{0}&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">func</span><span class="p">())</span>
-        <span class="k">return</span> <span class="n">wrapper</span>
-
-    <span class="c1"># make_header返回装饰器</span>
-    <span class="k">return</span> <span class="n">decorator</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">def</span> <span class="nf">make_header</span><span class="p">(</span><span class="n">level</span><span class="p">):</span></span>
+<span class="code-line">    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Create decorator&#39;</span><span class="p">)</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="c1"># 这部分跟通常的装饰器一样，只是wrapper通过闭包访问了变量level</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Initialize&#39;</span><span class="p">)</span></span>
+<span class="code-line">        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">():</span></span>
+<span class="code-line">            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Call&#39;</span><span class="p">)</span></span>
+<span class="code-line">            <span class="k">return</span> <span class="s1">&#39;&lt;h{0}&gt;{1}&lt;/h{0}&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">func</span><span class="p">())</span></span>
+<span class="code-line">        <span class="k">return</span> <span class="n">wrapper</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="c1"># make_header返回装饰器</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="n">decorator</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>看了实现代码，装饰器的<strong>构造</strong>和<strong>调用</strong>的时序已经很清楚了。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_header</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-<span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-<span class="o">...</span>
-<span class="n">Create</span> <span class="n">decorator</span>
-<span class="n">Initialize</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span>
-<span class="n">Call</span>
-<span class="s1">&#39;&lt;h2&gt;hello world&lt;/h2&gt;&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_header</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></span>
+<span class="code-line"><span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"><span class="o">...</span></span>
+<span class="code-line"><span class="n">Create</span> <span class="n">decorator</span></span>
+<span class="code-line"><span class="n">Initialize</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="p">()</span></span>
+<span class="code-line"><span class="n">Call</span></span>
+<span class="code-line"><span class="s1">&#39;&lt;h2&gt;hello world&lt;/h2&gt;&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <h3>2. 如何装饰有参数的函数？</h3>
 <p>为了有条理地理解装饰器，之前例子里的被装饰函数有意设计成无参的。我们来看个例子。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nd">@make_bold</span>
-<span class="k">def</span> <span class="nf">get_login_tip</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s1">&#39;Welcome back, {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="nd">@make_bold</span></span>
+<span class="code-line"><span class="k">def</span> <span class="nf">get_login_tip</span><span class="p">(</span><span class="n">name</span><span class="p">):</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="s1">&#39;Welcome back, {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>最直接的想法是把<code>get_login_tip</code>的参数透传下去。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">make_bold</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
-
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">class</span> <span class="nc">make_bold</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span></span>
+<span class="code-line">        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>如果被装饰的函数参数是明确固定的，这么写是没有问题的。但是<code>make_bold</code>明显不是这种场景。它既需要装饰没有参数的<code>get_content</code>，又需要装饰有参数的<code>get_login_tip</code>。这时候就需要可变参数了。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">make_bold</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">class</span> <span class="nc">make_bold</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span></span>
+<span class="code-line">        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>当装饰器不关心被装饰函数的参数，或是被装饰函数的参数多种多样的时候，可变参数非常合适。可变参数不属于装饰器的语法内容，这里就不深入探讨了。</p>
 <h3>3. 一个函数能否被多个装饰器装饰？</h3>
 <p>下面这么写合法吗？</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nd">@make_italic</span>
-<span class="nd">@make_bold</span>
-<span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="nd">@make_italic</span></span>
+<span class="code-line"><span class="nd">@make_bold</span></span>
+<span class="code-line"><span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>合法。上面的的代码和下面等价，留意一下装饰的顺序。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-<span class="n">get_content</span> <span class="o">=</span> <span class="n">make_bold</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span> <span class="c1"># 先装饰离函数定义近的</span>
-<span class="n">get_content</span> <span class="o">=</span> <span class="n">make_italic</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"><span class="n">get_content</span> <span class="o">=</span> <span class="n">make_bold</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span> <span class="c1"># 先装饰离函数定义近的</span></span>
+<span class="code-line"><span class="n">get_content</span> <span class="o">=</span> <span class="n">make_italic</span><span class="p">(</span><span class="n">get_content</span><span class="p">)</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <h3>4. <code>functools.wraps</code>有什么用？</h3>
 <p>Python的装饰器倍感贴心的地方是对调用方透明。调用方完全不知道也不需要知道调用的函数被装饰了。这样我们就能在调用方的代码完全不改动的前提下，给函数patch功能。</p>
 <p>为了对调用方透明，装饰器返回的对象要伪装成被装饰的函数。伪装得越像，对调用方来说差异越小。有时光伪装函数名和参数是不够的，因为Python的函数对象有一些元信息调用方可能读取了。为了连这些元信息也伪装上，<code>functools.wraps</code>出场了。它能用于把被调用函数的<code>__module__</code>，<code>__name__</code>，<code>__qualname__</code>，<code>__doc__</code>，<code>__annotations__</code>赋值给装饰器返回的函数对象。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">functools</span>
-
-<span class="k">def</span> <span class="nf">make_bold</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="nd">@functools.wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">wrapper</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="kn">import</span> <span class="nn">functools</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="k">def</span> <span class="nf">make_bold</span><span class="p">(</span><span class="n">func</span><span class="p">):</span></span>
+<span class="code-line">    <span class="nd">@functools.wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span></span>
+<span class="code-line">    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">return</span> <span class="s1">&#39;&lt;b&gt;{}&lt;/b&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="n">wrapper</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>对比一下效果。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_bold</span>
-<span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span>
-<span class="o">...</span>     <span class="s1">&#39;&#39;&#39;Return page content&#39;&#39;&#39;</span>
-<span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span>
-
-<span class="c1"># 不用functools.wraps的结果</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="o">.</span><span class="vm">__name__</span>
-<span class="s1">&#39;wrapper&#39;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="o">.</span><span class="vm">__doc__</span>
-<span class="o">&gt;&gt;&gt;</span>
-
-<span class="c1"># 用functools.wraps的结果</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="o">.</span><span class="vm">__name__</span>
-<span class="s1">&#39;get_content&#39;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="o">.</span><span class="vm">__doc__</span>
-<span class="s1">&#39;Return page content&#39;</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@make_bold</span></span>
+<span class="code-line"><span class="o">...</span> <span class="k">def</span> <span class="nf">get_content</span><span class="p">():</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="s1">&#39;&#39;&#39;Return page content&#39;&#39;&#39;</span></span>
+<span class="code-line"><span class="o">...</span>     <span class="k">return</span> <span class="s1">&#39;hello world&#39;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="c1"># 不用functools.wraps的结果</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="o">.</span><span class="vm">__name__</span></span>
+<span class="code-line"><span class="s1">&#39;wrapper&#39;</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="o">.</span><span class="vm">__doc__</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="c1"># 用functools.wraps的结果</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="o">.</span><span class="vm">__name__</span></span>
+<span class="code-line"><span class="s1">&#39;get_content&#39;</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">get_content</span><span class="o">.</span><span class="vm">__doc__</span></span>
+<span class="code-line"><span class="s1">&#39;Return page content&#39;</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>实现装饰器时往往不知道调用方会怎么用，所以养成好习惯加上<code>functools.wraps</code>吧。</p>
 <p>这次是真·完结了，有疑问请留言，撒花吧~~~</p></div>

@@ -87,62 +87,43 @@
 <h3>标准库</h3>
 <p>想找标准库的实现，分两种情况。大部分情况，标准库是纯Python实现的。还有一小部分标准库是C实现的。</p>
 <p>纯Python实现的标准库，可以不用直接去<code>Lib</code>下面找。Python内置了很好用的工具叫<code>inspect</code>。比如想知道<code>timeit.timeit()</code>的源码在哪，可以这么查。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">python</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">inspect</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">timeit</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsourcefile</span><span class="p">(</span><span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">)</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="n">python</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">inspect</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">timeit</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsourcefile</span><span class="p">(</span><span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">)</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p><code>inspect</code>只对纯Python实现的库有效，拿C实现的标准库一点招没有。</p>
 <p>C实现的标准库也有类似于<code>inspect</code>这种好用的方案，叫<a href="https://github.com/punchagan/cinspect">cinspect</a>，不过我没有尝试过。C的标准库不多，命名也比较容易懂。所以直接去<code>Modules</code>找一般很容易找到。</p>
 <p>如果不想对着文件名猜某个模块是不是在这实现，就需要工具来帮忙了。这里推荐一下速度比<code>grep</code>快得多的<a href="http://beyondgrep.com/">ack</a>。举个例子，想找<code>time</code>的源码，可以执行这个命令。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10</pre></div></td><td class="code"><div class="highlight"><pre><span></span>&gt; <span class="nb">cd</span> Modules
-&gt; 
-<span class="c1"># Python 2</span>
-&gt; ack <span class="s1">&#39;Py_InitModule3\(&quot;time&quot;&#39;</span>
-timemodule.c
-<span class="m">854</span>:    <span class="nv">m</span> <span class="o">=</span> Py_InitModule3<span class="o">(</span><span class="s2">&quot;time&quot;</span>, time_methods, module_doc<span class="o">)</span><span class="p">;</span>
-
-<span class="c1"># Python 3</span>
-&gt; ack <span class="s1">&#39;PyModuleDef&#39;</span> -A <span class="m">5</span> <span class="p">|</span> ack <span class="s1">&#39;&quot;time&quot;&#39;</span>
-timemodule.c-1331-    <span class="s2">&quot;time&quot;</span>,
+<div class="highlight"><pre><span class="code-line"><span></span>&gt; <span class="nb">cd</span> Modules</span>
+<span class="code-line">&gt; </span>
+<span class="code-line"><span class="c1"># Python 2</span></span>
+<span class="code-line">&gt; ack <span class="s1">&#39;Py_InitModule3\(&quot;time&quot;&#39;</span></span>
+<span class="code-line">timemodule.c</span>
+<span class="code-line"><span class="m">854</span>:    <span class="nv">m</span> <span class="o">=</span> Py_InitModule3<span class="o">(</span><span class="s2">&quot;time&quot;</span>, time_methods, module_doc<span class="o">)</span><span class="p">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="c1"># Python 3</span></span>
+<span class="code-line">&gt; ack <span class="s1">&#39;PyModuleDef&#39;</span> -A <span class="m">5</span> <span class="p">|</span> ack <span class="s1">&#39;&quot;time&quot;&#39;</span></span>
+<span class="code-line">timemodule.c-1331-    <span class="s2">&quot;time&quot;</span>,</span>
 </pre></div>
-</td></tr></table>
+
 
 <p><code>Modules/timemodule.c</code>就是<code>time</code>模块实现的地方。<code>Py_InitModule3</code>是Python 2 注册模块的宏，<code>PyModuleDef</code>是Python 3 模块定义的结构体的名字。这两个地方都要填上模块名作参数向解释器注册模块。所以这么搜模块名，一搜一个准。</p>
 <h3>语法实现</h3>
 <p>想知道某个语法怎么实现的去哪找呢？这时候就要去解读字节码，找到对应语法的字节码，并去<code>ceval.c</code>看具体实现。</p>
 <p>比如想看关键字<code>in</code>的实现，执行下面的代码可以看到<code>in</code>的字节码是<code>COMPARE_OP</code>。</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">dis</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">exp</span> <span class="o">=</span> <span class="s1">&#39;0 in (1, 2)&#39;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">code</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;eval&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">dis</span><span class="o">.</span><span class="n">dis</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-  <span class="mi">1</span>           <span class="mi">0</span> <span class="n">LOAD_CONST</span>               <span class="mi">0</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-              <span class="mi">3</span> <span class="n">LOAD_CONST</span>               <span class="mi">3</span> <span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-              <span class="mi">6</span> <span class="n">COMPARE_OP</span>               <span class="mi">6</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span>
-              <span class="mi">9</span> <span class="n">RETURN_VALUE</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">dis</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">exp</span> <span class="o">=</span> <span class="s1">&#39;0 in (1, 2)&#39;</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">code</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;eval&#39;</span><span class="p">)</span></span>
+<span class="code-line"><span class="o">&gt;&gt;&gt;</span> <span class="n">dis</span><span class="o">.</span><span class="n">dis</span><span class="p">(</span><span class="n">code</span><span class="p">)</span></span>
+<span class="code-line">  <span class="mi">1</span>           <span class="mi">0</span> <span class="n">LOAD_CONST</span>               <span class="mi">0</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span></span>
+<span class="code-line">              <span class="mi">3</span> <span class="n">LOAD_CONST</span>               <span class="mi">3</span> <span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></span>
+<span class="code-line">              <span class="mi">6</span> <span class="n">COMPARE_OP</span>               <span class="mi">6</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span></span>
+<span class="code-line">              <span class="mi">9</span> <span class="n">RETURN_VALUE</span></span>
 </pre></div>
-</td></tr></table>
+
 
 <p>具体各个字节码的意思可以去<a href="https://docs.python.org/2/library/dis.html#python-bytecode-instructions">这里</a>看解释。拿到了字节码后去<code>Python/ceval.c</code>里找<code>COMPARE_OP</code>的实现，会看到关键字<code>in</code>的实现在<code>PySequence_Contains</code>函数里。<code>ceval.c</code>里实现了字节码解析的eval loop，是整个源码中至关重要的部分。</p>
 <h3>其它情况</h3>
