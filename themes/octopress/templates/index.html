@@ -7,6 +7,9 @@
   		<article>
     		{% include '_includes/article.html' %}
   		</article>
+        {% if article.mathjax_script %}
+            {{ article.mathjax_script  }}
+        {% endif %}
   	{% endfor %}
   	{% include '_includes/pagination.html' %}
   {% endif %}
