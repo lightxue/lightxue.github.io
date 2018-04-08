@@ -1,17 +1,22 @@
 {% extends 'base.html' %}
+
+{% block head %}
+  <meta name="description" content="{{ DESCRIPTION }}" />
+{% endblock %}
+
 {% block content %}
 {% set index=True %}
 <div class="blog-index">
   {% if articles %}
-  	{% for article in articles_page.object_list %}
-  		<article>
-    		{% include '_includes/article.html' %}
-  		</article>
+    {% for article in articles_page.object_list %}
+        <article>
+            {% include '_includes/article.html' %}
+        </article>
         {% if article.mathjax_script %}
             {{ article.mathjax_script  }}
         {% endif %}
-  	{% endfor %}
-  	{% include '_includes/pagination.html' %}
+    {% endfor %}
+    {% include '_includes/pagination.html' %}
   {% endif %}
 </div>
 {% endblock %}
