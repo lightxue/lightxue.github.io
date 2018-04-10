@@ -85,7 +85,8 @@ DEFAULT_PAGINATION = 10
 PLUGIN_PATHS = ['plugins']
 PLUGINS = [
     'summary',
-    'render_math',
+    #'render_math',
+    'jsmath',
     'better_codeblock_line_numbering',
 ]
 
